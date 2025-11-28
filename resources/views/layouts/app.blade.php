@@ -44,11 +44,17 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a href="{{ route('orders.index') }}" 
+                           class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                           Orders   
+                        </a>
+                    </li>
+                    {{-- <li class="nav-item">
                         <a href="{{ route('profile') }}" 
                            class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
                            Profile
                         </a>
-                    </li>
+                    </li> --}}
                 </ul>
 
                 <!-- Right Side -->

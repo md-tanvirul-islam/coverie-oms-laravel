@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('joining_date')->nullable();
             $table->string('address')->nullable();
             $table->string('code')->unique();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

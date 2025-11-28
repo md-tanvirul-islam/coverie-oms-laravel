@@ -20,4 +20,9 @@ class ModeratorService
     {
         return $moderator->delete();
     }
+
+    public function dropdown()
+    {
+        return Moderator::pluck('name', 'id')->toArray();
+    }
 }
