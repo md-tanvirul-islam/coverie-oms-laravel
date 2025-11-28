@@ -1,33 +1,31 @@
 <?php
-
 namespace App\DataTables;
 
-use App\Models\User;
-use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Yajra\DataTables\EloquentDataTable;
-use Yajra\DataTables\Html\Builder as HtmlBuilder;
-use Yajra\DataTables\Html\Button;
-use Yajra\DataTables\Html\Column;
+use App\Models\Moderator;
 use Yajra\DataTables\Services\DataTable;
+use Yajra\DataTables\EloquentDataTable;
+use Yajra\DataTables\Html\Column;
+use Yajra\DataTables\Html\Button;
+use Illuminate\Database\Eloquent\Builder;
 
-class UsersDataTable extends DataTable
+class ModeratorsDataTable extends DataTable
 {
-    public function dataTable(QueryBuilder $query): EloquentDataTable
+    public function dataTable(Builder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'users.action')
+            ->addColumn('action', 'moderators.action')
             ->setRowId('id');
     }
 
-    public function query(User $model): QueryBuilder
+    public function query(Moderator $model): Builder
     {
         return $model->newQuery();
     }
 
-    public function html(): HtmlBuilder
+    public function html()
     {
         return $this->builder()
-            ->setTableId('users-table')
+            ->setTableId('moderators-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
@@ -38,7 +36,7 @@ class UsersDataTable extends DataTable
                 Button::make('pdf'),
                 Button::make('print'),
                 Button::make('reset'),
-                Button::make('reload')
+                Button::make('reload'),
             ]);
     }
 
@@ -47,9 +45,10 @@ class UsersDataTable extends DataTable
         return [
             Column::make('id'),
             Column::make('name'),
-            Column::make('email'),
-            Column::make('created_at'),
-            Column::make('updated_at'),
+            Column::make('phone'),
+            Column::make('joining_date'),
+            Column::make('address'),
+            Column::make('code'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
@@ -58,11 +57,8 @@ class UsersDataTable extends DataTable
         ];
     }
 
-    /**
-     * Get the filename for export.
-     */
     protected function filename(): string
     {
-        return 'Users_' . date('YmdHis');
+        return 'Moderators_' . date('YmdHis');
     }
 }

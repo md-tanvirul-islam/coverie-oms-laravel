@@ -37,7 +37,12 @@
                            Users
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a href="{{ route('moderators.index') }}" 
+                           class="nav-link {{ request()->routeIs('moderators.*') ? 'active' : '' }}">
+                           Moderators   
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('profile') }}" 
                            class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">

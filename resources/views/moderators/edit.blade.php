@@ -1,0 +1,62 @@
+@extends('layouts.app')
+
+@section('content')
+<h4 class="mb-3">Edit Moderator</h4>
+
+<div class="card shadow-sm p-4">
+    <form method="POST" action="{{ route('moderators.update', $moderator->id) }}">
+        @csrf
+        @method('PUT')
+
+        {{-- Name --}}
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+            <input name="name"
+                   value="{{ old('name', $moderator->name) }}"
+                   class="form-control @error('name') is-invalid @enderror"
+                   required>
+            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        {{-- Phone --}}
+        <div class="mb-3">
+            <label class="form-label">Phone</label>
+            <input name="phone"
+                   value="{{ old('phone', $moderator->phone) }}"
+                   class="form-control @error('phone') is-invalid @enderror">
+            @error('phone') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        {{-- Joining Date --}}
+        <div class="mb-3">
+            <label class="form-label">Joining Date</label>
+            <input type="date" name="joining_date"
+                   value="{{ old('joining_date', $moderator->joining_date) }}"
+                   class="form-control @error('joining_date') is-invalid @enderror">
+            @error('joining_date') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        {{-- Address --}}
+        <div class="mb-3">
+            <label class="form-label">Address</label>
+            <input name="address"
+                   value="{{ old('address', $moderator->address) }}"
+                   class="form-control @error('address') is-invalid @enderror">
+            @error('address') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        {{-- Code --}}
+        <div class="mb-3">
+            <label class="form-label">Code</label>
+            <input name="code"
+                   value="{{ old('code', $moderator->code) }}"
+                   class="form-control @error('code') is-invalid @enderror"
+                   required>
+            @error('code') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
+        <button class="btn btn-primary">Update</button>
+        <a href="{{ route('moderators.index') }}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+@endsection
