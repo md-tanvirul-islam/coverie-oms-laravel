@@ -12,7 +12,8 @@ class Moderator extends Model
         'phone',
         'joining_date',
         'address',
-        'code'
+        'code',
+        'commission_fee_per_order',
     ];
 
     /**

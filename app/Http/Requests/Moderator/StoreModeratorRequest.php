@@ -27,6 +27,7 @@ class StoreModeratorRequest extends FormRequest
             'joining_date' => 'nullable|date',
             'address'      => 'nullable|string|max:255',
             'code'         => 'required|string|max:50|unique:moderators,code',
+            'commission_fee_per_order'  => 'nullable|string',
         ];
     }
 }

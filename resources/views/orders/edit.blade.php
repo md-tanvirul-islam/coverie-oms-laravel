@@ -67,6 +67,18 @@
             @enderror
         </div>
 
+        {{-- Quantity --}}
+        <div class="mb-3">
+            <label class="form-label">Quantity</label>
+            <input type="number" step="1" name="quantity" 
+                   value="{{ old('quantity', $order->quantity) }}" 
+                   class="form-control @error('quantity') is-invalid @enderror" 
+                   required>
+            @error('quantity')
+                <div class="invalid-feedback">{{ $message }}</div>
+            @enderror
+        </div>
+
         {{-- Total Cost --}}
         <div class="mb-3">
             <label class="form-label">Total Cost</label>

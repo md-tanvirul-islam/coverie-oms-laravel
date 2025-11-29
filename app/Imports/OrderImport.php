@@ -58,9 +58,10 @@ class OrderImport implements
             'customer_name'    => $row['customer_name'],
             'customer_phone'   => $customerPhone,
             'customer_address' => $row['customer_address'] ?? null,
+            'quantity'         => $row['quantity'],
             'total_cost'       => $row['total_cost'],
             'phone_model'      => $row['phone_model'],
-            'moderator_id'     => $moderator?->id,  // safe navigation
+            'moderator_id'     => $moderator?->id,
         ]);
     }
 
@@ -91,6 +92,7 @@ class OrderImport implements
             '*.total_cost'       => 'required|numeric|min:0',
             '*.phone_model'      => 'required|string|max:255',
             '*.order_taken_by'   => 'required|exists:moderators,code',
+            '*.quantity'         => 'required|integer|min:1',
         ];
     }
 

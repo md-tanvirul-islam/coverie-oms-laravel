@@ -30,6 +30,7 @@ class StoreOrderRequest extends FormRequest
             'total_cost'       => 'required|numeric|min:0',
             'phone_model'      => 'required|string|max:255',
             'moderator_id'     => 'required|exists:moderators,id',
+            'quantity'         => 'required|integer|min:1',
         ];
     }
 }

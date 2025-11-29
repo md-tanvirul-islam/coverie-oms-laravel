@@ -24,8 +24,7 @@ class ModeratorController extends Controller
 
     public function store(StoreModeratorRequest $request)
     {
-        // dd($request->validated());
-
+        // dd($request->validated(), $request->all());
         $this->service->create($request->validated());
 
         return redirect()
@@ -40,6 +39,8 @@ class ModeratorController extends Controller
 
     public function update(UpdateModeratorRequest $request, Moderator $moderator)
     {
+        // dd($request->validated(), $request->all());
+
         $this->service->update($moderator, $request->validated());
 
         return redirect()

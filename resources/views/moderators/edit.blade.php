@@ -55,6 +55,15 @@
             @error('code') <div class="invalid-feedback">{{ $message }}</div> @enderror
         </div>
 
+        <div class="mb-3">
+            <label class="form-label">Commission Fee Per Order</label>
+            <input name="commission_fee_per_order" type="number" min="0"
+                   value="{{ old('commission_fee_per_order', $moderator->commission_fee_per_order) }}"
+                   class="form-control @error('commission_fee_per_order') is-invalid @enderror"
+                   required>
+            @error('commission_fee_per_order') <div class="invalid-feedback">{{ $message }}</div> @enderror
+        </div>
+
         <button class="btn btn-primary">Update</button>
         <a href="{{ route('moderators.index') }}" class="btn btn-secondary">Back</a>
     </form>

@@ -51,6 +51,7 @@ class OrdersDataTable extends DataTable
             Column::make('customer_name'),
             Column::make('customer_phone'),
             Column::make('customer_address'),
+            Column::make('quantity'),
             Column::make('total_cost'),
             Column::make('phone_model'),
             Column::make('moderator')->title('Order Taken By'),

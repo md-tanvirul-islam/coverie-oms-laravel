@@ -18,6 +18,7 @@ class Order extends Model
         'total_cost',
         'phone_model',
         'moderator_id',
+        'quantity',
     ];
 
     public function moderator()

@@ -49,6 +49,7 @@ class ModeratorsDataTable extends DataTable
             Column::make('joining_date'),
             Column::make('address'),
             Column::make('code'),
+            Column::make('commission_fee_per_order'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

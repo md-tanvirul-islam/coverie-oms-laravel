@@ -72,7 +72,6 @@ class OrderController extends Controller
                 $errors = [];
 
                 foreach ($import->failures() as $failure) {
-                    dd($failure);
                     $errors[] = [
                         "row"    => $failure->row(),
                         "errors" => implode(',', $failure->errors()), 
