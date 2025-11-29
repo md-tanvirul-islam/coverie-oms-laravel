@@ -1,33 +1,31 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+    <div class="container">
+        <div class="card">
 
-    <div class="mb-3 d-flex gap-2">
-        <a href="{{ route('orders.create') }}" class="btn btn-primary">
-            Add Order
-        </a>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span>Manage Orders</span>
+                <div class="btn-group" role="group">
+                    <a href="{{ route('orders.import') }}" class="btn btn-secondary">
+                        <i class="bi bi-upload"></i> Import Excel
+                    </a>
 
-        <a href="{{ route('orders.export') }}" class="btn btn-success">
-            Export Excel
-        </a>
+                    <a href="{{ route('orders.export') }}" class="btn btn-success">
+                        <i class="bi bi-download"></i> Export Excel
+                    </a>
 
-        <form action="{{ route('orders.import') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="d-flex gap-2">
-                <input type="file" name="file" class="form-control" required>
-                <button class="btn btn-warning">Import</button>
+                    <a href="{{ route('orders.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Order
+                    </a>
+                </div>
             </div>
-        </form>
-    </div>
 
-    <div class="card">
-        <div class="card-header">Orders</div>
-        <div class="card-body">
-            {{ $dataTable->table() }}
+            <div class="card-body">
+                {{ $dataTable->table() }}
+            </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')

@@ -21,10 +21,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     
     Route::resource('users', UserController::class);
     Route::resource('moderators', ModeratorController::class);
-    Route::resource('orders', OrderController::class);
-    // Excel upload/download
-    Route::post('orders/import', [OrderController::class, 'import'])->name('orders.import');
+
+    Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');
+    Route::post('orders/import', [OrderController::class, 'importStore'])->name('orders.import.store');
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
+    Route::resource('orders', OrderController::class);
 });
 
 require __DIR__ . '/auth.php';

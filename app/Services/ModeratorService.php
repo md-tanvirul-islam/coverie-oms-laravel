@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Services;
 
@@ -23,6 +23,13 @@ class ModeratorService
 
     public function dropdown()
     {
-        return Moderator::pluck('name', 'id')->toArray();
+        return Moderator::select('id', 'name', 'code')
+            ->get()
+            ->mapWithKeys(function ($mod) {
+                return [
+                    $mod->id => "{$mod->name} ({$mod->code})"
+                ];
+            })
+            ->toArray();
     }
 }

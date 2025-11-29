@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class Moderator extends Model
 {
@@ -13,4 +14,15 @@ class Moderator extends Model
         'address',
         'code'
     ];
+
+    /**
+     * Accessor: full_identity
+     * Output Format: "Name (CODE)"
+     */
+    protected function nameAndCode(): Attribute
+    {
+        return Attribute::get(function () {
+            return "{$this->name} ({$this->code})";
+        });
+    }
 }

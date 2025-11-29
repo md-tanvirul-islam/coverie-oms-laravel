@@ -14,7 +14,7 @@ class OrdersDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('moderator', fn($row) => $row->moderator?->name ?? '-')
+            ->addColumn('moderator', fn($row) => $row->moderator?->name_and_code ?? '-')
             ->addColumn('action', 'orders.action')
             ->setRowId('id');
     }
