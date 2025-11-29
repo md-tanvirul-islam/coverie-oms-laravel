@@ -2,6 +2,7 @@
 
 namespace App\Imports;
 
+use App\Enums\CourierName;
 use App\Models\CourierPaidInvoice;
 use App\Models\Order;
 use Illuminate\Support\Carbon;
@@ -20,6 +21,11 @@ class CourierPaidInvoiceImport implements
     SkipsOnFailure
 {
     use SkipsFailures;
+
+    public function __construct(public $courier_name = CourierName::PATHAO)
+    {
+        
+    }   
 
     public function model(array $row)
     {
@@ -66,6 +72,7 @@ class CourierPaidInvoiceImport implements
         // 4. Create courier invoice
         // ----------------------------
         return new CourierPaidInvoice([
+            'courier_name'        => $this->courier_name,
             'consignment_id'      => (string) ($row['consignment_id'] ?? null),
             'created_date'        => $createdDate,
             'invoice_type'        => $row['invoice_type'] ?? null,
@@ -93,7 +100,6 @@ class CourierPaidInvoiceImport implements
     public function rules(): array
     {
         return [
-            '*.courier_name'      => 'required|string|max:100',
             '*.consignment_id'    => [
                 'required',
                 'string',

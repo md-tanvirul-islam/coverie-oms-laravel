@@ -68,8 +68,6 @@ class CourierPaidInvoiceController extends Controller
             $import = new CourierPaidInvoiceImport($request->input('courier_name'));
             Excel::import($import, $request->file('file'));
 
-            dd($import->failures());
-
             if ($import->failures()->isNotEmpty()) {
                 $errors = [];
 
