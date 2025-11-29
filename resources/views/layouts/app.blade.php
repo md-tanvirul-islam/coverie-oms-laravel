@@ -55,6 +55,34 @@
                            Courier Paid Invoices   
                         </a>
                     </li>
+
+                    {{-- Reports Dropdown --}}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {{ request()->routeIs('reports.*') ? 'active' : '' }}" 
+                        href="#" id="reportsDropdown" 
+                        role="button" 
+                        data-bs-toggle="dropdown" 
+                        aria-expanded="false">
+                            Reports
+                        </a>
+
+                        <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
+                            {{-- Moderator Commission Report --}}
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('reports.moderator_commission.daily') ? 'active' : '' }}"
+                                href="{{ route('reports.moderator_commission.daily') }}">
+                                    Moderator Commission Report(Daily)
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item {{ request()->routeIs('reports.moderator_commission.monthly') ? 'active' : '' }}"
+                                href="{{ route('reports.moderator_commission.monthly') }}">
+                                    Moderator Commission Report(Monthly)
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+
                     {{-- <li class="nav-item">
                         <a href="{{ route('profile') }}" 
                            class="nav-link {{ request()->routeIs('profile') ? 'active' : '' }}">
