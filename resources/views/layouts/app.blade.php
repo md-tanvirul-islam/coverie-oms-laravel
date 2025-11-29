@@ -12,7 +12,7 @@
     @auth
     <!-- Navbar for logged in users -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
-        <div class="container">
+        <div class="container-fluid">
             <a class="navbar-brand" href="{{ url('/') }}">{{ config('app.name', 'Laravel App') }}</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
@@ -47,6 +47,12 @@
                         <a href="{{ route('orders.index') }}" 
                            class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
                            Orders   
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('courier_paid_invoices.index') }}" 
+                           class="nav-link {{ request()->routeIs('courier_paid_invoices.*') ? 'active' : '' }}">
+                           Courier Paid Invoices   
                         </a>
                     </li>
                     {{-- <li class="nav-item">
@@ -88,7 +94,7 @@
 
 
     <!-- Main Content -->
-    <main class="container">
+    <main class="m-2">
         @include('partials.alerts')
         @yield('content')
     </main>

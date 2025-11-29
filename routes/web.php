@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CourierPaidInvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ModeratorController;
 use App\Http\Controllers\OrderController;
@@ -26,6 +27,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('orders/import', [OrderController::class, 'importStore'])->name('orders.import.store');
     Route::get('orders/export', [OrderController::class, 'export'])->name('orders.export');
     Route::resource('orders', OrderController::class);
+
+    Route::get('courier_paid_invoices/import', [CourierPaidInvoiceController::class, 'import'])->name('courier_paid_invoices.import');
+    Route::post('courier_paid_invoices/import', [CourierPaidInvoiceController::class, 'importStore'])->name('courier_paid_invoices.import.store');
+    Route::get('courier_paid_invoices/export', [CourierPaidInvoiceController::class, 'export'])->name('courier_paid_invoices.export');
+    Route::resource('courier_paid_invoices', CourierPaidInvoiceController::class);
 });
 
 require __DIR__ . '/auth.php';

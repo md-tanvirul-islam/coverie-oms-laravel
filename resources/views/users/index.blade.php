@@ -1,10 +1,10 @@
 @extends('layouts.app')
  
 @section('content')
-    <div class="container">
+    <div class="m-2">
         <div class="card">
             <div class="card-header">Manage Users</div>
-            <div class="card-body">
+            <div class="card-body  table-responsive">
                 {{ $dataTable->table() }}
             </div>
         </div>
