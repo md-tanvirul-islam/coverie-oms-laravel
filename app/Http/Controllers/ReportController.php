@@ -67,15 +67,15 @@ class ReportController extends Controller
                 'moderators.id as moderator_id',
                 'moderators.name',
                 'moderators.code',
-                DB::raw("strftime('%Y', orders.order_date) as order_year"),
-                DB::raw("strftime('%m', orders.order_date) as order_month"),
+                DB::raw("YEAR(orders.order_date) as order_year"),
+                DB::raw("MONTH(orders.order_date) as order_month"),
                 DB::raw('SUM(orders.quantity) as total_quantity'),
                 DB::raw('SUM(orders.quantity * moderators.commission_fee_per_order) as total_commission')
             ])
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
             ->join('moderators', 'moderators.id', '=', 'orders.moderator_id')
             ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::DELIVERY)
-            ->groupBy('moderators.id', DB::raw("strftime('%Y', orders.order_date)"), DB::raw("strftime('%m', orders.order_date)"))
+            ->groupBy('moderators.id', DB::raw("YEAR(orders.order_date)"), DB::raw("MONTH(orders.order_date)"))
             ->orderBy('order_year')
             ->orderBy('order_month');
 
