@@ -42,7 +42,10 @@ return new class extends Migration
             $table->timestamps();
             $table->softDeletes();
             
-            $table->unique(['courier_name', 'consignment_id', 'order_id']);
+            $table->unique(
+                ['courier_name', 'consignment_id', 'order_id'], 
+                'cpi_courier_consignment_order_unique'
+            );
         });
     }
 
