@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $title ?? 'Laravel App' }}</title>
+    <title>{{ $title ?? 'Coverie OMS' }}</title>
 
     <style>
         body { background: #f8f9fa; }
@@ -16,7 +16,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ url('/') }}">Laravel App</a>
+        <a class="navbar-brand fw-bold" href="{{ url('/') }}">Coverie OMS</a>
 
         @auth
         <div class="ms-auto">
