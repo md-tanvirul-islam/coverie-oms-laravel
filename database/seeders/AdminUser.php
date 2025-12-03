@@ -23,7 +23,7 @@ class AdminUser extends Seeder
             return;
         }
 
-        User::factory()->create([
+        User::create([
             'name' => env('ADMIN_NAME', 'Admin') ,
             'email' => env('ADMIN_EMAIL'),
             'password' => bcrypt(env('ADMIN_PASSWORD')),
