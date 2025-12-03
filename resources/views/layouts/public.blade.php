@@ -30,7 +30,7 @@
         @else
         <div class="ms-auto">
             <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary">Login</a>
-            <a href="{{ route('register') }}" class="btn btn-sm btn-primary">Register</a>
+            {{-- <a href="{{ route('register') }}" class="btn btn-sm btn-primary">Register</a> --}}
         </div>
         @endauth
     </div>
