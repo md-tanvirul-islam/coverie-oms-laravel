@@ -21,10 +21,45 @@ class OrdersDataTable extends DataTable
 
     public function query(Order $model): Builder
     {
-        return $model->with('moderator')->newQuery();
+        $query = $model->with('moderator')->newQuery();
+
+        // Apply filters from request
+        $invoiceId = request('invoice_id');
+        $orderDate = request('order_date');
+        $customerName = request('customer_name');
+        $customerPhone = request('customer_phone');
+        $quantity = request('quantity');
+        $moderator = request('moderator');
+
+        if ($invoiceId) {
+            $query->where('invoice_id', 'like', "%$invoiceId%");
+        }
+
+        if ($orderDate) {
+            $query->whereDate('order_date', $orderDate);
+        }
+
+        if ($customerName) {
+            $query->where('customer_name', 'like', "%$customerName%");
+        }
+
+        if ($customerPhone) {
+            $query->where('customer_phone', 'like', "%$customerPhone%");
+        }
+
+        if ($quantity) {
+            $query->where('quantity', $quantity);
+        }
+
+        if ($moderator) {
+            $query->where('moderator_id', $moderator);
+        }
+
+        return $query;
     }
 
-        public function html()
+
+    public function html()
     {
         return $this->builder()
             ->setTableId('orders-table')
