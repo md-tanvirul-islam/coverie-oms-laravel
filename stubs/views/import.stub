@@ -9,10 +9,10 @@
                 <h5 class="mb-0">Import {{ models_title }} (Excel Upload)</h5>
 
                 <div class="btn-group" role="group">
-                    <a href="{{ route('{{ models }}.index') }}" class="btn btn-primary btn-sm">
+                    <a href="{{ route('{{route_prefix}}.index') }}" class="btn btn-primary btn-sm">
                         <i class="bi bi-list"></i> {{ model_title }} List
                     </a>
-                    <a href="{{ route('{{ models }}.export') }}" class="btn btn-success btn-sm">
+                    <a href="{{ route('{{route_prefix}}.export') }}" class="btn btn-success btn-sm">
                         <i class="bi bi-download"></i> Export Excel
                     </a>
                 </div>
@@ -39,7 +39,7 @@
                     </a>
                 </div>
 
-                <form action="{{ route('{{ models }}.import.store') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('{{route_prefix}}.import.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">

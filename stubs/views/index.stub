@@ -8,20 +8,8 @@
                 <span>Manage {{ models_title }}</span>
 
                 <div class="btn-group" role="group">
-
-                    @if({{ excel_import }})
-                    <a href="{{ route('{{ models }}.import') }}" class="btn btn-secondary">
-                        <i class="bi bi-upload"></i> Import Excel
-                    </a>
-                    @endif
-
-                    @if({{ excel_export }})
-                    <a href="{{ route('{{ models }}.export') }}" class="btn btn-success">
-                        <i class="bi bi-download"></i> Export Excel
-                    </a>
-                    @endif
-
-                    <a href="{{ route('{{ models }}.create') }}" class="btn btn-primary">
+                    {{ excel_buttons }}
+                    <a href="{{ route('{{route_prefix}}.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add {{ model_title }}
                     </a>
                 </div>

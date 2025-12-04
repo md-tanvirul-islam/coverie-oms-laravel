@@ -13,34 +13,8 @@ return new class extends Migration
     {
         Schema::create('{{ table }}', function (Blueprint $table) {
             $table->id();
-
-            @foreach($fields as $field => $config)
-            @if($config.type == 'string')
-            $table->string('{{ $field }}'{{ isset($config.length) ? ", {$config.length}" : "" }}){{ isset($config.unique) && $config.unique ? "->unique()" : "" }}{{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }}{{ isset($config.default) ? "->default({$config.default})" : "" }};
-            @elseif($config.type == 'text')
-            $table->text('{{ $field }}'){{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }};
-            @elseif($config.type == 'integer')
-            $table->integer('{{ $field }}'){{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }}{{ isset($config.default) ? "->default({$config.default})" : "" }};
-            @elseif($config.type == 'unsignedBigInteger')
-            $table->unsignedBigInteger('{{ $field }}'){{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }};
-            @elseif($config.type == 'decimal')
-            $table->decimal('{{ $field }}', {{ $config.precision }}, {{ $config.scale }}){{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }};
-            @elseif($config.type == 'boolean')
-            $table->boolean('{{ $field }}'){{ isset($config.default) ? "->default({$config.default})" : "" }};
-            @elseif($config.type == 'date')
-            $table->date('{{ $field }}'){{ isset($config.nullable) && $config.nullable ? "->nullable()" : "" }};
-            @endif
-            @endforeach
-
-            @if(isset($relations) && !empty($relations))
-            // Foreign keys
-            @foreach($relations as $relation)
-            $table->foreignId('{{ $relation.foreign }}')
-                ->constrained('{{ $relation.references }}')
-                ->onDelete('{{ $relation.onDelete ?? 'cascade' }}');
-            @endforeach
-            @endif
-
+{{ fields }}
+{{ relations }}
             $table->softDeletes();
             $table->timestamps();
         });

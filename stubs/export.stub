@@ -11,18 +11,14 @@ class {{ model }}sExport implements FromCollection, WithHeadings
     public function collection()
     {
         return {{ model }}::all([
-            @foreach($fields as $field => $config)
-            '{{ $field }}',
-            @endforeach
+            {{ fields_list }}
         ]);
     }
 
     public function headings(): array
     {
         return [
-            @foreach($fields as $field => $config)
-            '{{ strtoupper($field) }}',
-            @endforeach
+            {{ headings_list }}
         ];
     }
 }

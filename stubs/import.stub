@@ -16,18 +16,14 @@ class {{ model }}Import implements ToModel, WithHeadingRow, WithValidation, Skip
     public function model(array $row)
     {
         return new {{ model }}([
-            @foreach($fields as $field => $config)
-            '{{ $field }}' => $row[strtoupper('{{ $field }}')],
-            @endforeach
+            {{ fields_mapping }}
         ]);
     }
 
     public function rules(): array
     {
         return [
-            @foreach($fields as $field => $config)
-            '{{ strtoupper($field) }}' => '{{ $config.validation }}',
-            @endforeach
+            {{ validation_rules }}
         ];
     }
 }

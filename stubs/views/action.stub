@@ -1,11 +1,11 @@
 <div class="d-flex gap-2">
 
-    <a href="{{ route('{{ models }}.edit', $model->id) }}"
+    <a href="{{ route('{{route_prefix}}.edit', $model->id) }}"
        class="btn btn-warning btn-sm d-flex align-items-center gap-1">
         <i class="bi bi-pencil-square"></i>
     </a>
 
-    <form action="{{ route('{{ models }}.destroy', $model->id) }}"
+    <form action="{{ route('{{route_prefix}}.destroy', $model->id) }}"
           method="POST"
           onsubmit="return confirm('Delete this {{ model_title_lower }}?')">
         @csrf

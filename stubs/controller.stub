@@ -18,31 +18,31 @@ class {{ model }}Controller extends Controller
 
     public function index({{ model }}sDataTable $dataTable)
     {
-        return $dataTable->render('{{ models }}.index');
+        return $dataTable->render('{{ route_prefix }}.index');
     }
 
     public function create()
     {
-        return view('{{ models }}.create');
+        return view('{{ route_prefix }}.create');
     }
 
     public function store(Store{{ model }}Request $request)
     {
         $this->service->create($request->validated());
-        return redirect()->route('{{ models }}.index')->with('success', '{{ model }} created.');
+        return redirect()->route('{{ route_prefix }}.index')->with('success', '{{ model }} created.');
     }
 
     public function edit($id)
     {
         $model = $this->service->find($id);
-        return view('{{ models }}.edit', compact('model'));
+        return view('{{ route_prefix }}.edit', compact('model'));
     }
 
     public function update(Update{{ model }}Request $request, $id)
     {
         $model = $this->service->find($id);
         $this->service->update($model, $request->validated());
-        return redirect()->route('{{ models }}.index')->with('success', '{{ model }} updated.');
+        return redirect()->route('{{ route_prefix }}.index')->with('success', '{{ model }} updated.');
     }
 
     public function destroy($id)
@@ -54,7 +54,7 @@ class {{ model }}Controller extends Controller
 
     public function import()
     {
-        return view('{{ models }}.import');
+        return view('{{ route_prefix }}.import');
     }
 
     public function importStore(Request $request)

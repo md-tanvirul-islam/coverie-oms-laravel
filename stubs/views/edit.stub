@@ -4,14 +4,14 @@
 <h4 class="mb-3">Edit {{ model_title }}</h4>
 
 <div class="card shadow-sm p-4">
-    <form method="POST" action="{{ route('{{ models }}.update', ${{ variable }}->id) }}">
+    <form method="POST" action="{{ route('{{route_prefix}}.update', ${{ variable }}->id) }}">
         @csrf
         @method('PUT')
 
         {{ fields_inputs_edit }}
 
         <button class="btn btn-primary">Update</button>
-        <a href="{{ route('{{ models }}.index') }}" class="btn btn-secondary">Back</a>
+        <a href="{{ route('{{route_prefix}}.index') }}" class="btn btn-secondary">Back</a>
     </form>
 </div>
 @endsection

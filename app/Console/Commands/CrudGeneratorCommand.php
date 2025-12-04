@@ -114,12 +114,11 @@ class CrudGeneratorCommand extends Command
         $timestamp = date('Y_m_d_His');
         $migrationPath = database_path("migrations/{$timestamp}_{$migrationName}.php");
 
+        // Generate fields
         $fieldsCode = '';
         foreach ($config['fields'] as $field => $props) {
             $type = $props['type'];
-
-            // Start building the field line
-            $line = "\$table";
+            $line = "            \$table";
 
             switch ($type) {
                 case 'string':
@@ -150,7 +149,6 @@ class CrudGeneratorCommand extends Command
                     $line .= "->{$type}('{$field}')";
             }
 
-            // Add nullable, unique, and default options
             if (!empty($props['nullable'])) {
                 $line .= "->nullable()";
             }
@@ -162,18 +160,19 @@ class CrudGeneratorCommand extends Command
                 $line .= "->default({$default})";
             }
 
-            $fieldsCode .= $line . ";\n            ";
+            $fieldsCode .= $line . ";\n";
         }
 
-        // Handle foreign key relations if any
+        // Generate foreign key relations
         $relationsCode = '';
         if (!empty($config['relations'])) {
             foreach ($config['relations'] as $rel) {
                 $onDelete = $rel['onDelete'] ?? 'cascade';
-                $relationsCode .= "\$table->foreignId('{$rel['foreign']}')->constrained('{$rel['references']}')->onDelete('{$onDelete}');\n            ";
+                $relationsCode .= "            \$table->foreignId('{$rel['foreign']}')->constrained('{$rel['references']}')->onDelete('{$onDelete}');\n";
             }
         }
 
+        // Load stub and replace placeholders
         $stub = File::get(base_path('stubs/migration.stub'));
         $stub = str_replace(
             ['{{ table }}', '{{ fields }}', '{{ relations }}'],
@@ -181,10 +180,10 @@ class CrudGeneratorCommand extends Command
             $stub
         );
 
+        // Save migration
         File::put($migrationPath, $stub);
         $this->info("Migration created: {$migrationPath}");
     }
-
 
     protected function generateService($name, $config)
     {
@@ -239,12 +238,16 @@ class CrudGeneratorCommand extends Command
         $this->info("Requests created: {$storePath}, {$updatePath}");
     }
 
-
     protected function generateController($name, $config)
     {
         $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
         $stub = File::get(base_path('stubs/controller.stub'));
-        $stub = str_replace(['{{ model }}', '{{ service }}', '{{ request_namespace }}'], [$name, $name . 'Service', "App\\Http\\Requests\\{$name}"], $stub);
+        $route_prefix = $this->routePrefix($name);
+        $stub = str_replace(
+            ['{{ model }}', '{{ service }}', '{{ request_namespace }}', '{{ route_prefix }}'],
+            [$name, $name . 'Service', "App\\Http\\Requests\\{$name}", $route_prefix],
+            $stub
+        );
 
         File::put($controllerPath, $stub);
         $this->info("Controller created: {$controllerPath}");
@@ -283,63 +286,85 @@ class CrudGeneratorCommand extends Command
         $this->info("DataTable created: {$dataTablePath}");
     }
 
-
-    protected function generateImport($name, $config)
-    {
-        $importPath = app_path("Imports/{$name}Import.php");
-        $stub = File::get(base_path('stubs/import.stub'));
-
-        // Replace {{ model }}
-        $stub = str_replace('{{ model }}', $name, $stub);
-
-        // Generate dynamic fields for model array
-        $fieldsModel = '';
-        foreach ($config['fields'] as $field => $props) {
-            $fieldsModel .= "'{$field}' => \$row['" . strtoupper($field) . "'],\n            ";
-        }
-        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $fieldsModel, $stub);
-
-        // Generate dynamic validation rules
-        $fieldsRules = '';
-        foreach ($config['fields'] as $field => $props) {
-            $validation = $props['validation'] ?? '';
-            $fieldsRules .= "'" . strtoupper($field) . "' => '{$validation}',\n            ";
-        }
-        $stub = preg_replace('/return\s*\[\s*.*?@endforeach\s*\];/s', "return [\n            {$fieldsRules}        ];", $stub);
-
-        File::put($importPath, $stub);
-        $this->info("Import class created: {$importPath}");
-    }
-
-    protected function generateExport($name, $config)
+    protected function generateExport(string $name, array $config)
     {
         $exportPath = app_path("Exports/{$name}sExport.php");
         $stub = File::get(base_path('stubs/export.stub'));
 
-        // Replace {{ model }}
-        $stub = str_replace('{{ model }}', $name, $stub);
+        $fieldsList = implode(",\n            ", array_map(fn($f) => "'{$f}'", array_keys($config['fields'])));
+        $headingsList = implode(",\n            ", array_map(fn($f) => "'" . strtolower($f) . "'", array_keys($config['fields'])));
 
-        // Generate dynamic columns for collection
-        $fieldsCollection = '';
-        foreach ($config['fields'] as $field => $props) {
-            $fieldsCollection .= "'{$field}',\n            ";
-        }
-        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $fieldsCollection, $stub);
-
-        // Generate dynamic headings
-        $fieldsHeadings = '';
-        foreach ($config['fields'] as $field => $props) {
-            $fieldsHeadings .= "'" . strtoupper($field) . "',\n            ";
-        }
-        $stub = preg_replace('/headings\(\): array\s*\{\s*return\s*\[\s*.*?@endforeach\s*\];/s', "headings(): array {\n        return [\n            {$fieldsHeadings}        ];", $stub);
+        $stub = str_replace(
+            ['{{ model }}', '{{ fields_list }}', '{{ headings_list }}'],
+            [$name, $fieldsList, $headingsList],
+            $stub
+        );
 
         File::put($exportPath, $stub);
         $this->info("Export class created: {$exportPath}");
     }
 
+    protected function generateImport(string $name, array $config)
+    {
+        $importPath = app_path("Imports/{$name}Import.php");
+        $stub = File::get(base_path('stubs/import.stub'));
+
+        $fieldsMapping = implode(",\n            ", array_map(fn($f) => "'{$f}' => \$row['" . strtolower($f) . "']", array_keys($config['fields'])));
+        $validationRules = implode(",\n            ", array_map(fn($f, $props) => "'" . strtolower($f) . "' => '{$props['validation']}'", array_keys($config['fields']), $config['fields']));
+
+        $stub = str_replace(
+            ['{{ model }}', '{{ fields_mapping }}', '{{ validation_rules }}'],
+            [$name, $fieldsMapping, $validationRules],
+            $stub
+        );
+
+        File::put($importPath, $stub);
+        $this->info("Import class created: {$importPath}");
+    }
+
+
+    protected function appendRoutes($name, $config)
+    {
+        $routeFile = base_path('routes/web.php');
+        $route_prefix = $this->routePrefix($name);
+        $controller = $name . 'Controller';
+
+        $routes = [];
+        if (!empty($config['excel_import'])) {
+            $routes[] = "Route::get('{$route_prefix}/import', [{$controller}::class, 'import'])->name('{$route_prefix}.import');";
+            $routes[] = "Route::post('{$route_prefix}/import', [{$controller}::class, 'importStore'])->name('{$route_prefix}.import.store');";
+        }
+        if (!empty($config['excel_export'])) {
+            $routes[] = "Route::get('{$route_prefix}/export', [{$controller}::class, 'export'])->name('{$route_prefix}.export');";
+        }
+        $routes[] = "Route::resource('{$route_prefix}', {$controller}::class);";
+
+        File::append($routeFile, "\n" . implode("\n", $routes) . "\n");
+        $this->info("Routes appended to web.php");
+    }
+
+    private function modelSingularTitle(string $modelName): string
+    {
+        $words = preg_split('/(?=[A-Z])/', $modelName, -1, PREG_SPLIT_NO_EMPTY);
+        return implode(' ', $words);
+    }
+
+    private function modelPluralTitle(string $modelName): string
+    {
+        $words = preg_split('/(?=[A-Z])/', $modelName, -1, PREG_SPLIT_NO_EMPTY);
+        $pluralWords = array_merge(array_slice($words, 0, -1), [Str::plural(end($words))]);
+        return implode(' ', $pluralWords);
+    }
+
+    private function routePrefix(string $modelName): string
+    {
+        return strtolower(str_replace(" ", "_", $this->modelPluralTitle($modelName)));
+    }
+
     protected function generateViews($name, $config)
     {
-        $viewsDir = resource_path("views/{$name}s");
+        $route_prefix = $this->routePrefix($name);
+        $viewsDir = resource_path("views/{$route_prefix}");
         File::ensureDirectoryExists($viewsDir);
 
         $stubs = ['index', 'create', 'edit', 'action', 'import'];
@@ -348,12 +373,8 @@ class CrudGeneratorCommand extends Command
             $filePath = "{$viewsDir}/{$stubName}.blade.php";
 
             $stubContent = File::get($stubPath);
-            // Here you can replace dynamic placeholders like {{ model }}, {{ models }}, {{ fields_inputs }} etc.
-            $stubContent = str_replace(
-                ['{{ model }}', '{{ models }}', '{{ model_title }}', '{{ models_title }}', '{{ variable }}', '{{ excel_import }}', '{{ excel_export }}'],
-                [$name, Str::plural(Str::camel($name)), Str::title($name), Str::title(Str::plural($name)), Str::camel($name), $config['excel_import'] ?? false, $config['excel_export'] ?? false],
-                $stubContent
-            );
+
+            $stubContent = $this->replaceViewPlaceholders($stubContent, $name, $config, $route_prefix);
 
             File::put($filePath, $stubContent);
         }
@@ -361,23 +382,128 @@ class CrudGeneratorCommand extends Command
         $this->info("Views created: {$viewsDir}");
     }
 
-    protected function appendRoutes($name, $config)
+    /**
+     * Replace placeholders in a blade stub
+     */
+    private function replaceViewPlaceholders(string $stubContent, string $name, array $config, string $route_prefix): string
     {
-        $routeFile = base_path('routes/web.php');
-        $plural = Str::plural(Str::camel($name));
-        $controller = $name . 'Controller';
+        $variable = Str::camel($name);
+        return str_replace(
+            [
+                '{{ model }}',
+                '{{ models }}',
+                '{{ model_title }}',
+                '{{ models_title }}',
+                '{{route_prefix}}',
+                '{{ variable }}',
+                '{{ excel_buttons }}',
+                '{{ fields_inputs }}',
+                '{{ fields_inputs_edit }}',
+                '{{ import_columns }}'
+            ],
+            [
+                $name,
+                Str::plural($variable),
+                $this->modelSingularTitle($name),
+                $this->modelPluralTitle($name),
+                $route_prefix,
+                $variable,
+                $this->generateExcelButtons($route_prefix, $config),
+                $this->generateFieldsInputs($config),
+                $this->generateFieldsInputsEdit($config, $variable),
+                $this->generateImportColumns($config)
+            ],
+            $stubContent
+        );
+    }
 
-        $routes = [];
+    /**
+     * Generate Excel import/export buttons
+     */
+    private function generateExcelButtons(string $route_prefix, array $config): string
+    {
+        $buttons = '';
         if (!empty($config['excel_import'])) {
-            $routes[] = "Route::get('{$plural}/import', [{$controller}::class, 'import'])->name('{$plural}.import');";
-            $routes[] = "Route::post('{$plural}/import', [{$controller}::class, 'importStore'])->name('{$plural}.import.store');";
+            $buttons .= "<a href=\"{{ route('{$route_prefix}.import') }}\" class=\"btn btn-primary\">Import Excel</a>\n";
         }
         if (!empty($config['excel_export'])) {
-            $routes[] = "Route::get('{$plural}/export', [{$controller}::class, 'export'])->name('{$plural}.export');";
+            $buttons .= "<a href=\"{{ route('{$route_prefix}.export') }}\" class=\"btn btn-success\">Export Excel</a>\n";
         }
-        $routes[] = "Route::resource('{$plural}', {$controller}::class);";
+        return $buttons;
+    }
 
-        File::append($routeFile, "\n" . implode("\n", $routes) . "\n");
-        $this->info("Routes appended to web.php");
+    /**
+     * Generate input fields for create view
+     */
+    private function generateFieldsInputs(array $config): string
+    {
+        $html = '';
+        foreach ($config['fields'] as $field => $props) {
+            $html .= $this->generateInputField($field, $props, false);
+        }
+        return $html;
+    }
+
+    /**
+     * Generate input fields for edit view
+     */
+    private function generateFieldsInputsEdit(array $config, string $variable): string
+    {
+        $html = '';
+        foreach ($config['fields'] as $field => $props) {
+            $html .= $this->generateInputField($field, $props, true, $variable);
+        }
+        return $html;
+    }
+
+    /**
+     * Generate a single input field (for create or edit)
+     */
+    private function generateInputField(string $field, array $props, bool $isEdit = false, string $variable = ''): string
+    {
+        $label = Str::title(str_replace('_', ' ', $field));
+        $type = $props['type'];
+
+        $inputType = match ($type) {
+            'text' => 'textarea',
+            'integer', 'decimal' => 'number',
+            'boolean' => 'checkbox',
+            'date' => 'date',
+            default => 'text'
+        };
+
+        $oldValue = $isEdit ? "{{ \${$variable}->{$field} }}" : "{{ old('{$field}') }}";
+
+        if ($inputType === 'textarea') {
+            return "<div class=\"mb-3\">
+                        <label class=\"form-label\">{$label}</label>
+                        <textarea name=\"{$field}\" class=\"form-control\" rows=\"3\">{$oldValue}</textarea>
+                    </div>\n";
+        }
+
+        if ($inputType === 'checkbox') {
+            $checked = $isEdit ? "{{ \${$variable}->{$field} ? 'checked' : '' }}" : "{{ old('{$field}') ? 'checked' : '' }}";
+            return "<div class=\"form-check mb-3\">
+                        <input type=\"checkbox\" name=\"{$field}\" class=\"form-check-input\" value=\"1\" {$checked}>
+                        <label class=\"form-check-label\">{$label}</label>
+                    </div>\n";
+        }
+
+        return "<div class=\"mb-3\">
+                    <label class=\"form-label\">{$label}</label>
+                    <input type=\"{$inputType}\" name=\"{$field}\" class=\"form-control\" value=\"{$oldValue}\">
+                </div>\n";
+    }
+
+    /**
+     * Generate import columns list for import view
+     */
+    private function generateImportColumns(array $config): string
+    {
+        $html = '';
+        foreach ($config['fields'] as $field => $props) {
+            $html .= "<li>{$field}</li>\n";
+        }
+        return $html;
     }
 }
