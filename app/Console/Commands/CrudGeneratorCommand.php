@@ -165,12 +165,12 @@ class CrudGeneratorCommand extends Command
 
         // Generate foreign key relations
         $relationsCode = '';
-        if (!empty($config['relations'])) {
-            foreach ($config['relations'] as $rel) {
-                $onDelete = $rel['onDelete'] ?? 'cascade';
-                $relationsCode .= "            \$table->foreignId('{$rel['foreign']}')->constrained('{$rel['references']}')->onDelete('{$onDelete}');\n";
-            }
-        }
+        // if (!empty($config['relations'])) {
+        //     foreach ($config['relations'] as $rel) {
+        //         $onDelete = $rel['onDelete'] ?? 'cascade';
+        //         $relationsCode .= "            \$table->foreignId('{$rel['foreign']}')->constrained('{$rel['references']}')->onDelete('{$onDelete}');\n";
+        //     }
+        // }
 
         // Load stub and replace placeholders
         $stub = File::get(base_path('stubs/migration.stub'));
@@ -241,11 +241,38 @@ class CrudGeneratorCommand extends Command
     protected function generateController($name, $config)
     {
         $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
-        $stub = File::get(base_path('stubs/controller.stub'));
-        $route_prefix = $this->routePrefix($name);
+        $stub = File::get(base_path("stubs/controller.stub"));
+
+        $models = Str::plural($name);
+        $variable = Str::singular($this->routePrefix($name));
+
+        $createdBy = isset($config['fields']['created_by'])
+            ? "\$data['created_by'] = Auth::id() ?? null;"
+            : "";
+
+        $updatedBy = isset($config['fields']['updated_by'])
+            ? "\$data['updated_by'] = Auth::id() ?? null;"
+            : "";
+
         $stub = str_replace(
-            ['{{ model }}', '{{ service }}', '{{ request_namespace }}', '{{ route_prefix }}'],
-            [$name, $name . 'Service', "App\\Http\\Requests\\{$name}", $route_prefix],
+            [
+                '{{ model }}',
+                '{{ models }}',
+                '{{ variable }}',
+                '{{ route_prefix }}',
+                '{{ message_model }}',
+                '{{ created_by }}',
+                '{{ updated_by }}'
+            ],
+            [
+                $name,
+                $models,
+                $variable,
+                $this->routePrefix($name),
+                $this->modelSingularTitle($name),
+                $createdBy,
+                $updatedBy
+            ],
             $stub
         );
 
@@ -253,15 +280,18 @@ class CrudGeneratorCommand extends Command
         $this->info("Controller created: {$controllerPath}");
     }
 
+
     protected function generateDataTable($name, $config)
     {
         $dataTablePath = app_path("DataTables/{$name}sDataTable.php");
         $stub = File::get(base_path('stubs/datatable.stub'));
 
+        $route_prefix = $this->routePrefix($name);
+
         // Replace {{ model }} and {{ models }}
         $stub = str_replace(
-            ['{{ model }}', '{{ models }}'],
-            [$name, Str::plural(Str::camel($name))],
+            ['{{ model }}', '{{ route_prefix }}'],
+            [$name, $route_prefix],
             $stub
         );
 
@@ -387,14 +417,14 @@ class CrudGeneratorCommand extends Command
      */
     private function replaceViewPlaceholders(string $stubContent, string $name, array $config, string $route_prefix): string
     {
-        $variable = Str::camel($name);
+        $variable = Str::singular($route_prefix);
         return str_replace(
             [
                 '{{ model }}',
                 '{{ models }}',
                 '{{ model_title }}',
                 '{{ models_title }}',
-                '{{route_prefix}}',
+                '{{ route_prefix }}',
                 '{{ variable }}',
                 '{{ excel_buttons }}',
                 '{{ fields_inputs }}',

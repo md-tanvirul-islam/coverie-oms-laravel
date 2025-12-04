@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\{{ model }}sDataTable;
-use App\Exports\{{ model }}sExport;
+use App\DataTables\{{ models }}DataTable;
+use App\Exports\{{ models }}Export;
 use App\Http\Requests\{{ model }}\Store{{ model }}Request;
 use App\Http\Requests\{{ model }}\Update{{ model }}Request;
 use App\Imports\{{ model }}Import;
+use App\Models\{{ model }};
 use App\Services\{{ model }}Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -16,7 +18,7 @@ class {{ model }}Controller extends Controller
 {
     public function __construct(private {{ model }}Service $service) {}
 
-    public function index({{ model }}sDataTable $dataTable)
+    public function index({{ models }}DataTable $dataTable)
     {
         return $dataTable->render('{{ route_prefix }}.index');
     }
@@ -28,28 +30,40 @@ class {{ model }}Controller extends Controller
 
     public function store(Store{{ model }}Request $request)
     {
-        $this->service->create($request->validated());
-        return redirect()->route('{{ route_prefix }}.index')->with('success', '{{ model }} created.');
+        $data = $request->validated();
+
+        {{ created_by }}
+
+        $this->service->create($data);
+
+        return redirect()
+            ->route('{{ route_prefix }}.index')
+            ->with('success', '{{ message_model }} created.');
     }
 
-    public function edit($id)
+    public function edit({{ model }} ${{ variable }})
     {
-        $model = $this->service->find($id);
-        return view('{{ route_prefix }}.edit', compact('model'));
+        return view('{{ route_prefix }}.edit', compact('{{ variable }}'));
     }
 
-    public function update(Update{{ model }}Request $request, $id)
+    public function update(Update{{ model }}Request $request, {{ model }} ${{ variable }})
     {
-        $model = $this->service->find($id);
-        $this->service->update($model, $request->validated());
-        return redirect()->route('{{ route_prefix }}.index')->with('success', '{{ model }} updated.');
+        $data = $request->validated();
+
+        {{ updated_by }}
+
+        $this->service->update(${{ variable }}, $data);
+
+        return redirect()
+            ->route('{{ route_prefix }}.index')
+            ->with('success', '{{ message_model }} updated.');
     }
 
-    public function destroy($id)
+    public function destroy({{ model }} ${{ variable }})
     {
-        $model = $this->service->find($id);
-        $this->service->delete($model);
-        return back()->with('success', '{{ model }} deleted.');
+        $this->service->delete(${{ variable }});
+
+        return back()->with('success', '{{ message_model }} deleted.');
     }
 
     public function import()
@@ -85,6 +99,6 @@ class {{ model }}Controller extends Controller
 
     public function export()
     {
-        return Excel::download(new {{ model }}sExport, '{{ model }}s.xlsx');
+        return Excel::download(new {{ models }}Export, '{{ models }}.xlsx');
     }
 }

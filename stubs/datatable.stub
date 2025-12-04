@@ -13,7 +13,7 @@ class {{ model }}sDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', '{{ models }}.action')
+            ->addColumn('action', '{{ route_prefix }}.action')
             ->setRowId('id');
     }
 
@@ -25,7 +25,7 @@ class {{ model }}sDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-            ->setTableId('{{ models }}-table')
+            ->setTableId('{{ route_prefix }}_table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
@@ -46,11 +46,6 @@ class {{ model }}sDataTable extends DataTable
             @foreach($fields as $field => $config)
             Column::make('{{ $field }}'),
             @endforeach
-            Column::computed('action')
-                ->exportable(false)
-                ->printable(false)
-                ->width(60)
-                ->addClass('text-center'),
         ];
     }
 
