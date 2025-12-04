@@ -81,8 +81,8 @@ class CrudGeneratorCommand extends Command
         // Generate relationships
         $relationsCode = '';
         if (!empty($config['relations'])) {
-            foreach ($config['relations'] as $name => $rel) {
-                $relationName = is_string($name) ? $name : Str::camel(str_replace('_id', '', $rel['foreign'] ?? ''));
+            foreach ($config['relations'] as $rel_name => $rel) {
+                $relationName = is_string($rel_name) ? $rel_name : Str::camel(str_replace('_id', '', $rel['foreign'] ?? ''));
                 $foreign = isset($rel['foreign']) ? ", '{$rel['foreign']}'" : '';
                 $relationsCode .= "    public function {$relationName}()\n";
                 $relationsCode .= "    {\n";
