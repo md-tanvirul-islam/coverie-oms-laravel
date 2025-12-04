@@ -1,0 +1,16 @@
+@extends('layouts.app')
+
+@section('content')
+<h4 class="mb-3">Add {{ model_title }}</h4>
+
+<div class="card shadow-sm p-4">
+    <form method="POST" action="{{ route('{{ models }}.store') }}">
+        @csrf
+
+        {{ fields_inputs }}
+
+        <button class="btn btn-primary">Create</button>
+        <a href="{{ route('{{ models }}.index') }}" class="btn btn-secondary">Back</a>
+    </form>
+</div>
+@endsection

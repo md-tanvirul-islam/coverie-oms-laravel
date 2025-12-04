@@ -1,0 +1,30 @@
+{
+  "table": "orders",
+  "model": "Order",
+  "controller": "OrderController",
+  "service": "OrderService",
+  "data_table": "OrdersDataTable",
+
+  "excel_import": true,
+  "excel_export": true,
+
+  "relations": {
+    "moderator_id": {
+      "type": "belongsTo",
+      "model": "Moderator",
+      "dropdown": true
+    }
+  },
+
+  "fields": {
+    "invoice_id": { "type": "string", "validation": "required|string|max:50|unique:orders,invoice_id" },
+    "order_date": { "type": "date", "validation": "required|date" },
+    "customer_name": { "type": "string", "validation": "required|string|max:255" },
+    "customer_phone": { "type": "string", "validation": "required|string|max:50" },
+    "customer_address": { "type": "text", "validation": "nullable|string|max:500" },
+    "total_cost": { "type": "decimal", "validation": "required|numeric|min:0" },
+    "phone_model": { "type": "string", "validation": "required|string|max:255" },
+    "moderator_id": { "type": "foreign", "validation": "required|exists:moderators,id" },
+    "quantity": { "type": "integer", "validation": "required|integer|min:1" }
+  }
+}
