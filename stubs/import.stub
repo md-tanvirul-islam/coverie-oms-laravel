@@ -1,0 +1,33 @@
+<?php
+
+namespace App\Imports;
+
+use App\Models\{{ model }};
+use Maatwebsite\Excel\Concerns\ToModel;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\WithValidation;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+
+class {{ model }}Import implements ToModel, WithHeadingRow, WithValidation, SkipsOnFailure
+{
+    use SkipsFailures;
+
+    public function model(array $row)
+    {
+        return new {{ model }}([
+            @foreach($fields as $field)
+            '{{ $field }}' => $row[strtoupper('{{ $field }}')],
+            @endforeach
+        ]);
+    }
+
+    public function rules(): array
+    {
+        return [
+            @foreach($fields as $field => $config)
+            '{{ strtoupper($field) }}' => '{{ $config.validation }}',
+            @endforeach
+        ];
+    }
+}

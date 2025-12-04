@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class {{ model }} extends Model
+{
+    use SoftDeletes;
+
+    protected $fillable = [
+        @foreach($fields as $field => $config)
+        '{{ $field }}',
+        @endforeach
+    ];
+
+    @if(isset($relations) && !empty($relations))
+    // Relationships
+    @foreach($relations as $relation)
+    public function {{ $relation.name }}()
+    {
+        return $this->{{ $relation.type }}({{ $relation.model }}::class{{ isset($relation.foreign) ? ", '{$relation.foreign}'" : "" }});
+    }
+    @endforeach
+    @endif
+}

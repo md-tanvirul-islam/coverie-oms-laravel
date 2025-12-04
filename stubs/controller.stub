@@ -1,0 +1,90 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\DataTables\{{ model }}sDataTable;
+use App\Exports\{{ model }}sExport;
+use App\Http\Requests\{{ model }}\Store{{ model }}Request;
+use App\Http\Requests\{{ model }}\Update{{ model }}Request;
+use App\Imports\{{ model }}Import;
+use App\Services\{{ model }}Service;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+
+class {{ model }}Controller extends Controller
+{
+    public function __construct(private {{ model }}Service $service) {}
+
+    public function index({{ model }}sDataTable $dataTable)
+    {
+        return $dataTable->render('{{ models }}.index');
+    }
+
+    public function create()
+    {
+        return view('{{ models }}.create');
+    }
+
+    public function store(Store{{ model }}Request $request)
+    {
+        $this->service->create($request->validated());
+        return redirect()->route('{{ models }}.index')->with('success', '{{ model }} created.');
+    }
+
+    public function edit($id)
+    {
+        $model = $this->service->find($id);
+        return view('{{ models }}.edit', compact('model'));
+    }
+
+    public function update(Update{{ model }}Request $request, $id)
+    {
+        $model = $this->service->find($id);
+        $this->service->update($model, $request->validated());
+        return redirect()->route('{{ models }}.index')->with('success', '{{ model }} updated.');
+    }
+
+    public function destroy($id)
+    {
+        $model = $this->service->find($id);
+        $this->service->delete($model);
+        return back()->with('success', '{{ model }} deleted.');
+    }
+
+    public function import()
+    {
+        return view('{{ models }}.import');
+    }
+
+    public function importStore(Request $request)
+    {
+        $request->validate(['file' => 'required|file|mimes:xlsx,csv']);
+
+        try {
+            $import = new {{ model }}Import;
+            Excel::import($import, $request->file('file'));
+
+            if ($import->failures()->isNotEmpty()) {
+                $errors = [];
+                foreach ($import->failures() as $failure) {
+                    $errors[] = [
+                        "row" => $failure->row(),
+                        "errors" => implode(',', $failure->errors()),
+                    ];
+                }
+                return back()->with("import_errors", $errors);
+            }
+
+            return back()->with('success', 'Excel imported successfully.');
+        } catch (\Exception $e) {
+            Log::error('{{ model }} import failed: ' . $e->getMessage(), ['exception' => $e]);
+            return back()->with('error', 'Import failed. Please check the file and try again.');
+        }
+    }
+
+    public function export()
+    {
+        return Excel::download(new {{ model }}sExport, '{{ model }}s.xlsx');
+    }
+}

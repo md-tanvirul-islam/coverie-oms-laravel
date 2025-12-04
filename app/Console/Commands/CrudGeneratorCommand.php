@@ -15,9 +15,9 @@ class CrudGeneratorCommand extends Command
     {
         $name = Str::studly($this->argument('name')); // e.g. Order
         $variable = Str::camel($name);               // e.g. order
-        $plural = Str::plural($variable);            // e.g. orders
-        $title = Str::title($name);
-        $pluralTitle = Str::title(Str::plural($name));
+        $plural = Str::snake(Str::plural($name));            // e.g. orders
+        // $title = Str::title($name);
+        // $pluralTitle = Str::title(Str::plural($name));
 
         $jsonPath = base_path("crud/{$plural}.json");
 

@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Http\Requests\{{ model }};
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class Update{{ model }}Request extends FormRequest
+{
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    public function rules(): array
+    {
+        return [
+            @foreach($fields as $field => $config)
+            '{{ $field }}' => '{{ str_replace("unique:{{ table }},$field", "unique:{{ table }},$field,' . $this->{{ model_variable }}->id", $config.validation) }}',
+            @endforeach
+        ];
+    }
+}

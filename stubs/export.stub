@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Exports;
+
+use App\Models\{{ model }};
+use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+
+class {{ model }}sExport implements FromCollection, WithHeadings
+{
+    public function collection()
+    {
+        return {{ model }}::all([
+            @foreach($fields as $field)
+            '{{ $field }}',
+            @endforeach
+        ]);
+    }
+
+    public function headings(): array
+    {
+        return [
+            @foreach($fields as $field)
+            '{{ strtoupper($field) }}',
+            @endforeach
+        ];
+    }
+}

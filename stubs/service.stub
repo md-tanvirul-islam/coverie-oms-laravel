@@ -1,0 +1,28 @@
+<?php
+
+namespace App\Services;
+
+use App\Models\{{ model }};
+
+class {{ model }}Service
+{
+    public function create(array $data)
+    {
+        return {{ model }}::create($data);
+    }
+
+    public function update({{ model }} $model, array $data)
+    {
+        return $model->update($data);
+    }
+
+    public function delete({{ model }} $model)
+    {
+        return $model->delete();
+    }
+
+    public function find($id)
+    {
+        return {{ model }}::findOrFail($id);
+    }
+}

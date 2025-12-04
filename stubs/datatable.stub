@@ -1,0 +1,61 @@
+<?php
+
+namespace App\DataTables;
+
+use App\Models\{{ model }};
+use Yajra\DataTables\Services\DataTable;
+use Yajra\DataTables\EloquentDataTable;
+use Yajra\DataTables\Html\Button;
+use Yajra\DataTables\Html\Column;
+
+class {{ model }}sDataTable extends DataTable
+{
+    public function dataTable($query): EloquentDataTable
+    {
+        return (new EloquentDataTable($query))
+            ->addColumn('action', '{{ models }}.action')
+            ->setRowId('id');
+    }
+
+    public function query({{ model }} $model)
+    {
+        return $model->newQuery();
+    }
+
+    public function html()
+    {
+        return $this->builder()
+            ->setTableId('{{ models }}-table')
+            ->columns($this->getColumns())
+            ->minifiedAjax()
+            ->orderBy(1)
+            ->selectStyleSingle()
+            ->buttons([
+                Button::make('excel'),
+                Button::make('csv'),
+                Button::make('pdf'),
+                Button::make('print'),
+                Button::make('reset'),
+                Button::make('reload'),
+            ]);
+    }
+
+    public function getColumns(): array
+    {
+        return [
+            @foreach($fields as $field => $config)
+            Column::make('{{ $field }}'),
+            @endforeach
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),
+        ];
+    }
+
+    protected function filename(): string
+    {
+        return '{{ model }}s_' . date('YmdHis');
+    }
+}

@@ -1,0 +1,31 @@
+{
+  "table": "express_types",
+  "excel_import": true,
+  "excel_export": true,
+  "fields": {
+    "name": {
+      "type": "string",
+      "validation": "required|string|max:255|unique:express_types,name"
+    },
+    "description": {
+      "type": "text",
+      "validation": "nullable|string|max:1000"
+    },
+    "is_active": {
+      "type": "boolean",
+      "validation": "required|boolean"
+    },
+    "is_showing_in_report": {
+      "type": "boolean",
+      "validation": "required|boolean"
+    },
+    "created_by": {
+      "type": "unsignedBigInteger",
+      "validation": "nullable|integer"
+    },
+    "updated_by": {
+      "type": "unsignedBigInteger",
+      "validation": "nullable|integer"
+    }
+  }
+}
