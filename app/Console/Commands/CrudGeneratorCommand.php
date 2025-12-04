@@ -71,24 +71,38 @@ class CrudGeneratorCommand extends Command
             return;
         }
 
-        $fillable = array_keys($config['fields']);
-        $fillableStr = implode("',\n        '", $fillable);
+        // Generate fillable fields
+        $fillableCode = '';
+        foreach ($config['fields'] as $field => $props) {
+            $fillableCode .= "        '{$field}',\n";
+        }
+        $fillableCode = rtrim($fillableCode, "\n"); // remove trailing newline
 
+        // Generate relationships
         $relationsCode = '';
         if (!empty($config['relations'])) {
-            foreach ($config['relations'] as $field => $rel) {
-                $relName = Str::camel(str_replace('_id', '', $field));
-                $relationsCode .= "\n    public function {$relName}()\n    {\n        return \$this->{$rel['type']}({$rel['model']}::class);\n    }\n";
+            foreach ($config['relations'] as $name => $rel) {
+                $relationName = is_string($name) ? $name : Str::camel(str_replace('_id', '', $rel['foreign'] ?? ''));
+                $foreign = isset($rel['foreign']) ? ", '{$rel['foreign']}'" : '';
+                $relationsCode .= "    public function {$relationName}()\n";
+                $relationsCode .= "    {\n";
+                $relationsCode .= "        return \$this->{$rel['type']}({$rel['model']}::class{$foreign});\n";
+                $relationsCode .= "    }\n\n";
             }
+            $relationsCode = rtrim($relationsCode, "\n"); // remove trailing newline
         }
 
+        // Load stub
         $stub = File::get(base_path('stubs/model.stub'));
+
+        // Replace placeholders
         $stub = str_replace(
             ['{{ model }}', '{{ fillable }}', '{{ relations }}'],
-            [$name, $fillableStr, $relationsCode],
+            [$name, $fillableCode, $relationsCode],
             $stub
         );
 
+        // Save model file
         File::put($modelPath, $stub);
         $this->info("Model created: {$modelPath}");
     }
@@ -103,41 +117,74 @@ class CrudGeneratorCommand extends Command
         $fieldsCode = '';
         foreach ($config['fields'] as $field => $props) {
             $type = $props['type'];
+
+            // Start building the field line
+            $line = "\$table";
+
             switch ($type) {
                 case 'string':
-                    $fieldsCode .= "\$table->string('{$field}')";
+                    $length = $props['length'] ?? 255;
+                    $line .= "->string('{$field}', {$length})";
                     break;
                 case 'text':
-                    $fieldsCode .= "\$table->text('{$field}')";
+                    $line .= "->text('{$field}')";
                     break;
                 case 'integer':
-                    $fieldsCode .= "\$table->integer('{$field}')";
+                    $line .= "->integer('{$field}')";
+                    break;
+                case 'unsignedBigInteger':
+                    $line .= "->unsignedBigInteger('{$field}')";
                     break;
                 case 'decimal':
-                    $fieldsCode .= "\$table->decimal('{$field}', 10, 2)";
+                    $precision = $props['precision'] ?? 10;
+                    $scale = $props['scale'] ?? 2;
+                    $line .= "->decimal('{$field}', {$precision}, {$scale})";
+                    break;
+                case 'boolean':
+                    $line .= "->boolean('{$field}')";
                     break;
                 case 'date':
-                    $fieldsCode .= "\$table->date('{$field}')";
-                    break;
-                case 'foreign':
-                    $fieldsCode .= "\$table->foreignId('{$field}')->constrained()->onDelete('cascade')";
+                    $line .= "->date('{$field}')";
                     break;
                 default:
-                    $fieldsCode .= "\$table->{$type}('{$field}')";
+                    $line .= "->{$type}('{$field}')";
             }
-            $fieldsCode .= ";\n            ";
+
+            // Add nullable, unique, and default options
+            if (!empty($props['nullable'])) {
+                $line .= "->nullable()";
+            }
+            if (!empty($props['unique'])) {
+                $line .= "->unique()";
+            }
+            if (isset($props['default'])) {
+                $default = is_string($props['default']) ? "'{$props['default']}'" : $props['default'];
+                $line .= "->default({$default})";
+            }
+
+            $fieldsCode .= $line . ";\n            ";
+        }
+
+        // Handle foreign key relations if any
+        $relationsCode = '';
+        if (!empty($config['relations'])) {
+            foreach ($config['relations'] as $rel) {
+                $onDelete = $rel['onDelete'] ?? 'cascade';
+                $relationsCode .= "\$table->foreignId('{$rel['foreign']}')->constrained('{$rel['references']}')->onDelete('{$onDelete}');\n            ";
+            }
         }
 
         $stub = File::get(base_path('stubs/migration.stub'));
         $stub = str_replace(
-            ['{{ table }}', '{{ fields }}'],
-            [$table, $fieldsCode],
+            ['{{ table }}', '{{ fields }}', '{{ relations }}'],
+            [$table, $fieldsCode, $relationsCode],
             $stub
         );
 
         File::put($migrationPath, $stub);
         $this->info("Migration created: {$migrationPath}");
     }
+
 
     protected function generateService($name, $config)
     {
@@ -155,30 +202,49 @@ class CrudGeneratorCommand extends Command
 
     protected function generateRequests($name, $config)
     {
-        $storePath = app_path("Http/Requests/{$name}/Store{$name}Request.php");
-        $updatePath = app_path("Http/Requests/{$name}/Update{$name}Request.php");
+        $storeDir = app_path("Http/Requests/{$name}");
+        $storePath = "{$storeDir}/Store{$name}Request.php";
+        $updatePath = "{$storeDir}/Update{$name}Request.php";
 
-        File::ensureDirectoryExists(dirname($storePath));
+        File::ensureDirectoryExists($storeDir);
 
-        $rulesArr = [];
+        // Generate validation rules from JSON fields
+        $rulesCode = '';
         foreach ($config['fields'] as $field => $props) {
-            $rulesArr[] = "'{$field}' => '{$props['validation']}'";
+            $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
         }
-        $rules = implode(",\n            ", $rulesArr);
 
-        $storeStub = str_replace(['{{ rules }}'], [$rules], File::get(base_path('stubs/request.store.stub')));
-        $updateStub = str_replace(['{{ rules }}', '{{ model_variable }}'], [$rules, Str::camel($name)], File::get(base_path('stubs/request.update.stub')));
+        // Load stubs
+        $storeStub = File::get(base_path('stubs/request.store.stub'));
+        $updateStub = File::get(base_path('stubs/request.update.stub'));
 
+        // Replace placeholders in StoreRequest
+        $storeStub = str_replace(
+            ['{{ model }}', '{{ rules }}'],
+            [$name, rtrim($rulesCode)],
+            $storeStub
+        );
+
+        // Replace placeholders in UpdateRequest
+        $updateStub = str_replace(
+            ['{{ model }}', '{{ rules }}', '{{ model_variable }}'],
+            [$name, rtrim($rulesCode), Str::camel($name)],
+            $updateStub
+        );
+
+        // Save files
         File::put($storePath, $storeStub);
         File::put($updatePath, $updateStub);
+
         $this->info("Requests created: {$storePath}, {$updatePath}");
     }
+
 
     protected function generateController($name, $config)
     {
         $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
         $stub = File::get(base_path('stubs/controller.stub'));
-        $stub = str_replace(['{{ model }}', '{{ service }}', '{{ request_namespace }}'], [$name, $name.'Service', "App\\Http\\Requests\\{$name}"], $stub);
+        $stub = str_replace(['{{ model }}', '{{ service }}', '{{ request_namespace }}'], [$name, $name . 'Service', "App\\Http\\Requests\\{$name}"], $stub);
 
         File::put($controllerPath, $stub);
         $this->info("Controller created: {$controllerPath}");
@@ -188,17 +254,59 @@ class CrudGeneratorCommand extends Command
     {
         $dataTablePath = app_path("DataTables/{$name}sDataTable.php");
         $stub = File::get(base_path('stubs/datatable.stub'));
-        $stub = str_replace(['{{ model }}'], [$name], $stub);
 
+        // Replace {{ model }} and {{ models }}
+        $stub = str_replace(
+            ['{{ model }}', '{{ models }}'],
+            [$name, Str::plural(Str::camel($name))],
+            $stub
+        );
+
+        // Generate dynamic columns from JSON fields
+        $columnsCode = '';
+        foreach ($config['fields'] as $field => $props) {
+            $columnsCode .= "Column::make('{$field}'),\n            ";
+        }
+
+        // Add computed action column at the end
+        $columnsCode .= "Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),";
+
+        // Replace the @foreach placeholder with actual column code
+        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $columnsCode, $stub);
+
+        // Save the generated DataTable file
         File::put($dataTablePath, $stub);
         $this->info("DataTable created: {$dataTablePath}");
     }
+
 
     protected function generateImport($name, $config)
     {
         $importPath = app_path("Imports/{$name}Import.php");
         $stub = File::get(base_path('stubs/import.stub'));
-        $stub = str_replace(['{{ model }}'], [$name], $stub);
+
+        // Replace {{ model }}
+        $stub = str_replace('{{ model }}', $name, $stub);
+
+        // Generate dynamic fields for model array
+        $fieldsModel = '';
+        foreach ($config['fields'] as $field => $props) {
+            $fieldsModel .= "'{$field}' => \$row['" . strtoupper($field) . "'],\n            ";
+        }
+        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $fieldsModel, $stub);
+
+        // Generate dynamic validation rules
+        $fieldsRules = '';
+        foreach ($config['fields'] as $field => $props) {
+            $validation = $props['validation'] ?? '';
+            $fieldsRules .= "'" . strtoupper($field) . "' => '{$validation}',\n            ";
+        }
+        $stub = preg_replace('/return\s*\[\s*.*?@endforeach\s*\];/s', "return [\n            {$fieldsRules}        ];", $stub);
+
         File::put($importPath, $stub);
         $this->info("Import class created: {$importPath}");
     }
@@ -207,7 +315,24 @@ class CrudGeneratorCommand extends Command
     {
         $exportPath = app_path("Exports/{$name}sExport.php");
         $stub = File::get(base_path('stubs/export.stub'));
-        $stub = str_replace(['{{ model }}'], [$name], $stub);
+
+        // Replace {{ model }}
+        $stub = str_replace('{{ model }}', $name, $stub);
+
+        // Generate dynamic columns for collection
+        $fieldsCollection = '';
+        foreach ($config['fields'] as $field => $props) {
+            $fieldsCollection .= "'{$field}',\n            ";
+        }
+        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $fieldsCollection, $stub);
+
+        // Generate dynamic headings
+        $fieldsHeadings = '';
+        foreach ($config['fields'] as $field => $props) {
+            $fieldsHeadings .= "'" . strtoupper($field) . "',\n            ";
+        }
+        $stub = preg_replace('/headings\(\): array\s*\{\s*return\s*\[\s*.*?@endforeach\s*\];/s', "headings(): array {\n        return [\n            {$fieldsHeadings}        ];", $stub);
+
         File::put($exportPath, $stub);
         $this->info("Export class created: {$exportPath}");
     }
@@ -240,7 +365,7 @@ class CrudGeneratorCommand extends Command
     {
         $routeFile = base_path('routes/web.php');
         $plural = Str::plural(Str::camel($name));
-        $controller = $name.'Controller';
+        $controller = $name . 'Controller';
 
         $routes = [];
         if (!empty($config['excel_import'])) {

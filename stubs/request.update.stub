@@ -14,9 +14,7 @@ class Update{{ model }}Request extends FormRequest
     public function rules(): array
     {
         return [
-            @foreach($fields as $field => $config)
-            '{{ $field }}' => '{{ str_replace("unique:{{ table }},$field", "unique:{{ table }},$field,' . $this->{{ model_variable }}->id", $config.validation) }}',
-            @endforeach
+            {{ rules }}
         ];
     }
 }

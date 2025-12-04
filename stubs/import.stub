@@ -16,7 +16,7 @@ class {{ model }}Import implements ToModel, WithHeadingRow, WithValidation, Skip
     public function model(array $row)
     {
         return new {{ model }}([
-            @foreach($fields as $field)
+            @foreach($fields as $field => $config)
             '{{ $field }}' => $row[strtoupper('{{ $field }}')],
             @endforeach
         ]);

@@ -14,9 +14,7 @@ class Store{{ model }}Request extends FormRequest
     public function rules(): array
     {
         return [
-            @foreach($fields as $field => $config)
-            '{{ $field }}' => '{{ $config.validation }}',
-            @endforeach
+            {{ rules }}
         ];
     }
 }
