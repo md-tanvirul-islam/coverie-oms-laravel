@@ -4,8 +4,8 @@ namespace App\Enums;
 
 enum PaidInvoiceType: string
 {
-    case DELIVERY = 'delivery';
-    case RETURN = 'return';
+    case TYPE_DELIVERY = 'delivery';
+    case TYPE_RETURN = 'return';
 
     /**
      * Return all enum values

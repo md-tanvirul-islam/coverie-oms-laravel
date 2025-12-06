@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{{ $title ?? 'Coverie OMS' }}</title>
+    <title>{{ $title ?? 'SSM OMS' }}</title>
 
     <style>
         body { background: #f8f9fa; }
@@ -16,7 +16,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="{{ url('/') }}">Coverie OMS</a>
+        <a class="navbar-brand fw-bold" href="{{ url('/') }}">SSM OMS</a>
 
         @auth
         <div class="ms-auto">
