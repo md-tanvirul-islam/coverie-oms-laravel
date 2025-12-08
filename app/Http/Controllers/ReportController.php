@@ -36,7 +36,7 @@ class ReportController extends Controller
             ])
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
             ->join('moderators', 'moderators.id', '=', 'orders.moderator_id')
-            ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::DELIVERY)
+            ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::TYPE_DELIVERY)
             ->groupBy('orders.order_date', 'moderators.id');
 
         if ($from) {
@@ -74,7 +74,7 @@ class ReportController extends Controller
             ])
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
             ->join('moderators', 'moderators.id', '=', 'orders.moderator_id')
-            ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::DELIVERY)
+            ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::TYPE_DELIVERY)
             ->groupBy('moderators.id', DB::raw("YEAR(orders.order_date)"), DB::raw("MONTH(orders.order_date)"))
             ->orderBy('order_year')
             ->orderBy('order_month');

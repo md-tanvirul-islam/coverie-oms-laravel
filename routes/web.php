@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+// use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [DashboardController::class, 'welcome'])->name("welcome");
@@ -20,6 +21,10 @@ Route::get('/', [DashboardController::class, 'welcome'])->name("welcome");
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dashboard'])->name("dashboard");
+
+    // Route::group(['prefix' => 'lw'], function () {    
+    //     Route::get('/dashboard', Dashboard::class)->name('dashboard');
+    // });
 
     Route::resource('users', UserController::class);
     Route::resource('moderators', ModeratorController::class);
