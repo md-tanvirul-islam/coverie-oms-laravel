@@ -280,14 +280,26 @@ class CrudGeneratorCommand extends Command
         $rulesCode = '';
         foreach ($config['fields'] as $field => $props) {
             $rules = explode('|', $props['validation'] ?? '');
-            $rules = array_map(function ($r) use ($route_prefix) {
+            $has_unique = false;
+            $rules = array_map(function ($r) use ($route_prefix, &$has_unique) {
                 if (str_contains($r, 'unique')) {
-                    return $r . "',' . \$this->{$route_prefix}->id,";
+                    $has_unique = true;
+                    return $r . ",'. \$this->{$route_prefix}->id";
                 }
+
                 return $r;
             }, $rules);
+
             $props['validation'] = implode('|', $rules);
-            $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
+            // if(str_contains($props['validation'], 'unique')){
+            //     dd($has_unique, $props['validation']);
+            // }
+
+            if ($has_unique) {
+                $rulesCode .= "            '{$field}' => '{$props['validation']},\n";
+            } else {
+                $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
+            }
         }
 
         // Replace placeholders in UpdateRequest
@@ -347,7 +359,6 @@ class CrudGeneratorCommand extends Command
         File::put($controllerPath, $stub);
         $this->info("Controller created: {$controllerPath}");
     }
-
 
     protected function generateDataTable($config)
     {
@@ -419,7 +430,6 @@ class CrudGeneratorCommand extends Command
         File::put($importPath, $stub);
         $this->info("Import class created: {$importPath}");
     }
-
 
     protected function appendRoutes($config)
     {
