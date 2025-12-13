@@ -2,13 +2,14 @@
 
 namespace App\DataTables;
 
-use App\Models\{{ model }};
+use App\Http\Requests\{{ model }}\Filter{{ model }}Request;
+use App\Services\{{ model }}Service;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 
-class {{ model }}sDataTable extends DataTable
+class {{ model_plural }}DataTable extends DataTable
 {
     public function dataTable($query): EloquentDataTable
     {
@@ -17,9 +18,11 @@ class {{ model }}sDataTable extends DataTable
             ->setRowId('id');
     }
 
-    public function query({{ model }} $model)
+    public function query(Filter{{ model }}Request $request, {{ model }}Service $service)
     {
-        return $model->newQuery();
+        $data = $request->all();
+
+        return $service->list($data, true);
     }
 
     public function html()

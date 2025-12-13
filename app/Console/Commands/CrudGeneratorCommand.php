@@ -256,6 +256,7 @@ class CrudGeneratorCommand extends Command
         $storeDir = app_path("Http/Requests/{$model_name}");
         $storePath = "{$storeDir}/Store{$model_name}Request.php";
         $updatePath = "{$storeDir}/Update{$model_name}Request.php";
+        $filterPath = "{$storeDir}/Filter{$model_name}Request.php";
 
         File::ensureDirectoryExists($storeDir);
 
@@ -291,9 +292,6 @@ class CrudGeneratorCommand extends Command
             }, $rules);
 
             $props['validation'] = implode('|', $rules);
-            // if(str_contains($props['validation'], 'unique')){
-            //     dd($has_unique, $props['validation']);
-            // }
 
             if ($has_unique) {
                 $rulesCode .= "            '{$field}' => '{$props['validation']},\n";
@@ -313,7 +311,32 @@ class CrudGeneratorCommand extends Command
         // Save Update Request files
         File::put($updatePath, $updateStub);
 
-        $this->info("Requests created: {$storePath}, {$updatePath}");
+        // Generate validation rules from JSON fields for Filter Request
+        $rulesCode = '';
+        foreach ($config['fields'] as $field => $props) {
+            $rules = explode('|', $props['validation'] ?? '');
+
+            $rules = array_filter($rules, function ($r) { return in_array($r, ['string', 'integer', 'boolean']); });
+
+            $rules[] = 'nullable';
+
+            $props['validation'] = implode('|', $rules);
+
+            $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
+        }
+
+        // Replace placeholders in StoreRequest
+        $filterStub = File::get(base_path('stubs/request.filter.stub'));
+        $filterStub = str_replace(
+            ['{{ model }}', '{{ rules }}'],
+            [$model_name, rtrim($rulesCode)],
+            $filterStub
+        );
+
+        // Save Create Request files
+        File::put($filterPath, $filterStub);
+
+        $this->info("Requests created: {$storePath}, {$updatePath}, {$filterPath}");
     }
 
     protected function generateController($config)
@@ -382,7 +405,7 @@ class CrudGeneratorCommand extends Command
                 ->width(60)
                 ->addClass('text-center'),";
 
-        $stub = str_replace(['{{ model }}', '{{ route_prefix }}', '{{ tableColumns }}'], [$model_name, $route_prefix, $columnsCode], $stub);
+        $stub = str_replace(['{{ model }}', '{{ model_plural }}', '{{ route_prefix }}', '{{ tableColumns }}'], [$model_name, $model_plural, $route_prefix, $columnsCode], $stub);
 
         // Save the generated DataTable file
         File::put($dataTablePath, $stub);
@@ -401,8 +424,8 @@ class CrudGeneratorCommand extends Command
         $headingsList = implode(",\n            ", array_map(fn($f) => "'" . strtolower($f) . "'", array_keys($config['fields'])));
 
         $stub = str_replace(
-            ['{{ model }}', '{{ fields_list }}', '{{ headings_list }}'],
-            [$model_name, $fieldsList, $headingsList],
+            ['{{ model }}', '{{ model_plural }}', '{{ fields_list }}', '{{ headings_list }}'],
+            [$model_name, $model_plural, $fieldsList, $headingsList],
             $stub
         );
 
@@ -422,8 +445,8 @@ class CrudGeneratorCommand extends Command
         $validationRules = implode(",\n            ", array_map(fn($f, $props) => "'" . strtolower($f) . "' => '{$props['validation']}'", array_keys($config['fields']), $config['fields']));
 
         $stub = str_replace(
-            ['{{ model }}', '{{ fields_mapping }}', '{{ validation_rules }}'],
-            [$model_name, $fieldsMapping, $validationRules],
+            ['{{ model }}', '{{ model_plural }}', '{{ fields_mapping }}', '{{ validation_rules }}'],
+            [$model_name, $model_plural, $fieldsMapping, $validationRules],
             $stub
         );
 

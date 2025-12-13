@@ -2,7 +2,8 @@
 
 namespace App\DataTables;
 
-use App\Models\Stores;
+use App\Http\Requests\Store\FilterStoreRequest;
+use App\Services\StoreService;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Button;
@@ -17,9 +18,11 @@ class StoresDataTable extends DataTable
             ->setRowId('id');
     }
 
-    public function query(Stores $model)
+    public function query(FilterStoreRequest $request, StoreService $storeService)
     {
-        return $model->newQuery();
+        $data = $request->all();
+
+        return $storeService->list($data, true);
     }
 
     public function html()
@@ -61,6 +64,6 @@ class StoresDataTable extends DataTable
 
     protected function filename(): string
     {
-        return 'Storess_' . date('YmdHis');
+        return 'Stores_' . date('YmdHis');
     }
 }

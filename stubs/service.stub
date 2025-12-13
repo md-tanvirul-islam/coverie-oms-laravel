@@ -6,24 +6,24 @@ use App\Models\{{ model }};
 
 class {{ model }}Service
 {
-    public function lists($data = null)
+    public function list($data = [], $is_query_only = false, $is_paginated = true)
     {
         $order = "asc";
 
-        $query = {{ model }}::query;
+        $query = {{ model }}::query();
 
         $query = $query->with([]);
 
         //filter options
         {{ filters }}
 
-        if (isset($data["only_query"]) && $data["only_query"]) {
+        if ($is_query_only === true) {
             return $query;
         }
 
-        if ($this->paginatedList === true) {
+        if ($is_paginated === true) {
             $item_per_page = isset($data['item_per_page']) ? $data['item_per_page'] : config('constants.pagination.per_page');
-            ${{ table }} = $query->paginate($item_per_page)->appends($search_query);
+            ${{ table }} = $query->paginate($item_per_page)->appends($data);
             ${{ table }}->pagination_summary = get_pagination_summary(${{ table }});
         } else {
             ${{ table }} = $query->get();
