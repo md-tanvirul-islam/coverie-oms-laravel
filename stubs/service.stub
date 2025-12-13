@@ -15,7 +15,7 @@ class {{ model }}Service
         $query = $query->with([]);
 
         //filter options
-        {{ filter }}
+        {{ filters }}
 
         if (isset($data["only_query"]) && $data["only_query"]) {
             return $query;
