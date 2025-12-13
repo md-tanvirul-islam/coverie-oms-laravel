@@ -8,18 +8,14 @@ use Illuminate\Support\Str;
 
 class CrudGeneratorCommand extends Command
 {
-    protected $signature = 'crud:generate {name}';
-    protected $description = 'Generate CRUD based on JSON structure';
+    protected $signature = 'crud:generate {file_name}';
+    protected $description = 'Generate CRUD based on JSON structure. E.g. php artisan crud:generate file_name (store.json)';
 
     public function handle()
     {
-        $name = Str::studly($this->argument('name')); // e.g. Order
-        $variable = Str::camel($name);               // e.g. order
-        $plural = Str::snake(Str::plural($name));            // e.g. orders
-        // $title = Str::title($name);
-        // $pluralTitle = Str::title(Str::plural($name));
+        $file_name = $this->argument('file_name');
 
-        $jsonPath = base_path("crud/{$plural}.json");
+        $jsonPath = base_path("crud/{$file_name}");
 
         if (!File::exists($jsonPath)) {
             $this->error("JSON file not found at {$jsonPath}");
@@ -28,68 +24,100 @@ class CrudGeneratorCommand extends Command
 
         $config = json_decode(File::get($jsonPath), true);
 
+        $model = $config['model'] ?? null;
+
+        if (!$model) {
+            $this->error("model key is not defined in JSON file.");
+            return 1;
+        }
+
+        $table = $config['table'] ?? null;
+
+        if (!$table) {
+            $this->error("table key is not defined in JSON file.");
+            return 1;
+        }
+
+        $route_prefix = $config['route_prefix'] ?? null;
+
+        if (!$route_prefix) {
+            $this->error("route_prefix key is not defined in JSON file.");
+            return 1;
+        }
+
+        //input confirmation
+        $this->info("Generating CRUD for Model: {$model}, Table: {$table}, Route Prefix: {$route_prefix}");
+        if (!$this->confirm('Do you wish to continue?')) {
+            $this->info('Command cancelled.');
+            return 0;
+        }
+
+        // dd($config);
+
         // 1. Generate Model
-        $this->generateModel($name, $config);
+        $this->generateModel($model, $config);
 
         // 2. Generate Migration
-        $this->generateMigration($name, $config);
+        $this->generateMigration($config);
 
         // 3. Generate Service
-        $this->generateService($name, $config);
+        $this->generateService($config);
 
         // 4. Generate Requests
-        $this->generateRequests($name, $config);
+        $this->generateRequests($config);
 
         // 5. Generate Controller
-        $this->generateController($name, $config);
+        $this->generateController($config);
 
         // 6. Generate DataTable
-        $this->generateDataTable($name, $config);
+        $this->generateDataTable($config);
 
         // 7. Generate Import/Export
         if (!empty($config['excel_import'])) {
-            $this->generateImport($name, $config);
+            $this->generateImport($config);
         }
         if (!empty($config['excel_export'])) {
-            $this->generateExport($name, $config);
+            $this->generateExport($config);
         }
 
         // 8. Generate Views
-        $this->generateViews($name, $config);
+        $this->generateViews($config);
 
         // 9. Append Routes
-        $this->appendRoutes($name, $config);
+        $this->appendRoutes($config);
 
-        $this->info("CRUD for {$name} generated successfully!");
+        $this->info("CRUD for {$model} Model generated successfully!");
     }
 
-    protected function generateModel($name, $config)
+    protected function generateModel($config)
     {
-        $modelPath = app_path("Models/{$name}.php");
+        $model_name = $config['model'];
+
+        $modelPath = app_path("Models/{$model_name}.php");
         if (File::exists($modelPath)) {
-            $this->warn("Model {$name} already exists. Skipping.");
+            $this->warn("Model {$model_name} already exists. Skipping.");
             return;
         }
 
         // Generate fillable fields
-        $fillableCode = '';
+        $fillable_fields = '';
         foreach ($config['fields'] as $field => $props) {
-            $fillableCode .= "        '{$field}',\n";
+            $fillable_fields .= "        '{$field}',\n";
         }
-        $fillableCode = rtrim($fillableCode, "\n"); // remove trailing newline
+        $fillable_fields = rtrim($fillable_fields, "\n"); // remove trailing newline
 
         // Generate relationships
-        $relationsCode = '';
+        $model_relations = '';
         if (!empty($config['relations'])) {
             foreach ($config['relations'] as $rel_name => $rel) {
                 $relationName = is_string($rel_name) ? $rel_name : Str::camel(str_replace('_id', '', $rel['foreign'] ?? ''));
                 $foreign = isset($rel['foreign']) ? ", '{$rel['foreign']}'" : '';
-                $relationsCode .= "    public function {$relationName}()\n";
-                $relationsCode .= "    {\n";
-                $relationsCode .= "        return \$this->{$rel['type']}({$rel['model']}::class{$foreign});\n";
-                $relationsCode .= "    }\n\n";
+                $model_relations .= "    public function {$relationName}()\n";
+                $model_relations .= "    {\n";
+                $model_relations .= "        return \$this->{$rel['type']}({$rel['model']}::class{$foreign});\n";
+                $model_relations .= "    }\n\n";
             }
-            $relationsCode = rtrim($relationsCode, "\n"); // remove trailing newline
+            $model_relations = rtrim($model_relations, "\n"); // remove trailing newline
         }
 
         // Load stub
@@ -97,8 +125,8 @@ class CrudGeneratorCommand extends Command
 
         // Replace placeholders
         $stub = str_replace(
-            ['{{ model }}', '{{ fillable }}', '{{ relations }}'],
-            [$name, $fillableCode, $relationsCode],
+            ['{{ modelName }}', '{{ fillableFields }}', '{{ modelRelations }}'],
+            [$model_name, $fillable_fields, $model_relations],
             $stub
         );
 
@@ -107,9 +135,9 @@ class CrudGeneratorCommand extends Command
         $this->info("Model created: {$modelPath}");
     }
 
-    protected function generateMigration($name, $config)
+    protected function generateMigration($config)
     {
-        $table = $config['table'] ?? Str::snake(Str::plural($name));
+        $table = $config['table'];
         $migrationName = 'create_' . $table . '_table';
         $timestamp = date('Y_m_d_His');
         $migrationPath = database_path("migrations/{$timestamp}_{$migrationName}.php");
@@ -185,13 +213,34 @@ class CrudGeneratorCommand extends Command
         $this->info("Migration created: {$migrationPath}");
     }
 
-    protected function generateService($name, $config)
+    protected function generateService($config)
     {
-        $servicePath = app_path("Services/{$name}Service.php");
+        $model_name = $config['model'];
+        $table_name = $config['table'];
+        $servicePath = app_path("Services/{$model_name}Service.php");
+
+        //create filer options
+        $filters = '';
+        foreach ($config['fields'] as $field => $props) {
+            if ($props['type'] === 'text') {
+                continue; // skip text fields for filtering
+            }
+            if ($props['type'] === 'boolean') {
+                $filters .= "        if(array_key_exists('{$field}', \$data)) {\n";
+                $filters .= "            \$query->where('{$field}', \$data['{$field}']);\n";
+                $filters .= "        }\n\n";
+            } else {
+                $filters .= "        if(isset(\$data['{$field}'])) {\n";
+                $filters .= "            \$query->where('{$field}', \$data['{$field}']);\n";
+                $filters .= "        }\n\n";
+            }
+        }
+        $filters = rtrim($filters, "\n"); // remove trailing newline
+
         $stub = File::get(base_path('stubs/service.stub'));
         $stub = str_replace(
-            ['{{ model }}'],
-            [$name],
+            ['{{ model }}',  '{{ table }}', '{{ filters }}'],
+            [$model_name, $table_name, $filters],
             $stub
         );
 
@@ -199,11 +248,14 @@ class CrudGeneratorCommand extends Command
         $this->info("Service created: {$servicePath}");
     }
 
-    protected function generateRequests($name, $config)
+    protected function generateRequests($config)
     {
-        $storeDir = app_path("Http/Requests/{$name}");
-        $storePath = "{$storeDir}/Store{$name}Request.php";
-        $updatePath = "{$storeDir}/Update{$name}Request.php";
+        $model_name = $config['model'];
+        $route_prefix = $config['route_prefix'];
+
+        $storeDir = app_path("Http/Requests/{$model_name}");
+        $storePath = "{$storeDir}/Store{$model_name}Request.php";
+        $updatePath = "{$storeDir}/Update{$model_name}Request.php";
 
         File::ensureDirectoryExists($storeDir);
 
@@ -213,38 +265,52 @@ class CrudGeneratorCommand extends Command
             $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
         }
 
-        // Load stubs
-        $storeStub = File::get(base_path('stubs/request.store.stub'));
-        $updateStub = File::get(base_path('stubs/request.update.stub'));
-
         // Replace placeholders in StoreRequest
+        $storeStub = File::get(base_path('stubs/request.store.stub'));
         $storeStub = str_replace(
             ['{{ model }}', '{{ rules }}'],
-            [$name, rtrim($rulesCode)],
+            [$model_name, rtrim($rulesCode)],
             $storeStub
         );
 
+        // Save Create Request files
+        File::put($storePath, $storeStub);
+
+        // Generate validation rules from JSON fields
+        $rulesCode = '';
+        foreach ($config['fields'] as $field => $props) {
+            $rules = explode('|', $props['validation'] ?? '');
+            $rules = array_map(function ($r) use ($route_prefix) {
+                if (str_contains($r, 'unique')) {
+                    return $r . "',' . \$this->{$route_prefix}->id,";
+                }
+                return $r;
+            }, $rules);
+            $props['validation'] = implode('|', $rules);
+            $rulesCode .= "            '{$field}' => '{$props['validation']}',\n";
+        }
+
         // Replace placeholders in UpdateRequest
+        $updateStub = File::get(base_path('stubs/request.update.stub'));
         $updateStub = str_replace(
-            ['{{ model }}', '{{ rules }}', '{{ model_variable }}'],
-            [$name, rtrim($rulesCode), Str::camel($name)],
+            ['{{ model }}', '{{ rules }}'],
+            [$model_name, rtrim($rulesCode)],
             $updateStub
         );
 
-        // Save files
-        File::put($storePath, $storeStub);
+        // Save Update Request files
         File::put($updatePath, $updateStub);
 
         $this->info("Requests created: {$storePath}, {$updatePath}");
     }
 
-    protected function generateController($name, $config)
+    protected function generateController($config)
     {
-        $controllerPath = app_path("Http/Controllers/{$name}Controller.php");
-        $stub = File::get(base_path("stubs/controller.stub"));
+        $model_name = $config['model'];
+        $route_prefix = $config['route_prefix'];
 
-        $models = Str::plural($name);
-        $variable = Str::singular($this->routePrefix($name));
+        $controllerPath = app_path("Http/Controllers/{$model_name}Controller.php");
+        $stub = File::get(base_path("stubs/controller.stub"));
 
         $createdBy = isset($config['fields']['created_by'])
             ? "\$data['created_by'] = Auth::id() ?? null;"
@@ -253,6 +319,8 @@ class CrudGeneratorCommand extends Command
         $updatedBy = isset($config['fields']['updated_by'])
             ? "\$data['updated_by'] = Auth::id() ?? null;"
             : "";
+
+        $variable = Str::singular($route_prefix);
 
         $stub = str_replace(
             [
@@ -265,11 +333,11 @@ class CrudGeneratorCommand extends Command
                 '{{ updated_by }}'
             ],
             [
-                $name,
-                $models,
+                $model_name,
+                Str::plural($model_name),
                 $variable,
-                $this->routePrefix($name),
-                $this->modelSingularTitle($name),
+                $route_prefix,
+                $this->modelSingularTitle($model_name),
                 $createdBy,
                 $updatedBy
             ],
@@ -281,19 +349,14 @@ class CrudGeneratorCommand extends Command
     }
 
 
-    protected function generateDataTable($name, $config)
+    protected function generateDataTable($config)
     {
-        $dataTablePath = app_path("DataTables/{$name}sDataTable.php");
+        $model_name = $config['model'];
+        $route_prefix = $config['route_prefix'];
+        $model_plural = Str::plural($model_name);
+
+        $dataTablePath = app_path("DataTables/{$model_plural}DataTable.php");
         $stub = File::get(base_path('stubs/datatable.stub'));
-
-        $route_prefix = $this->routePrefix($name);
-
-        // Replace {{ model }} and {{ models }}
-        $stub = str_replace(
-            ['{{ model }}', '{{ route_prefix }}'],
-            [$name, $route_prefix],
-            $stub
-        );
 
         // Generate dynamic columns from JSON fields
         $columnsCode = '';
@@ -308,17 +371,19 @@ class CrudGeneratorCommand extends Command
                 ->width(60)
                 ->addClass('text-center'),";
 
-        // Replace the @foreach placeholder with actual column code
-        $stub = preg_replace('/@foreach\(\$fields as \$field => \$config\).*?@endforeach/s', $columnsCode, $stub);
+        $stub = str_replace(['{{ model }}', '{{ route_prefix }}', '{{ tableColumns }}'], [$model_name, $route_prefix, $columnsCode], $stub);
 
         // Save the generated DataTable file
         File::put($dataTablePath, $stub);
         $this->info("DataTable created: {$dataTablePath}");
     }
 
-    protected function generateExport(string $name, array $config)
+    protected function generateExport(array $config)
     {
-        $exportPath = app_path("Exports/{$name}sExport.php");
+        $model_name = $config['model'];
+        $model_plural = Str::plural($model_name);
+
+        $exportPath = app_path("Exports/{$model_plural}sExport.php");
         $stub = File::get(base_path('stubs/export.stub'));
 
         $fieldsList = implode(",\n            ", array_map(fn($f) => "'{$f}'", array_keys($config['fields'])));
@@ -326,7 +391,7 @@ class CrudGeneratorCommand extends Command
 
         $stub = str_replace(
             ['{{ model }}', '{{ fields_list }}', '{{ headings_list }}'],
-            [$name, $fieldsList, $headingsList],
+            [$model_name, $fieldsList, $headingsList],
             $stub
         );
 
@@ -334,9 +399,12 @@ class CrudGeneratorCommand extends Command
         $this->info("Export class created: {$exportPath}");
     }
 
-    protected function generateImport(string $name, array $config)
+    protected function generateImport(array $config)
     {
-        $importPath = app_path("Imports/{$name}Import.php");
+        $model_name = $config['model'];
+        $model_plural = Str::plural($model_name);
+
+        $importPath = app_path("Imports/{$model_plural}Import.php");
         $stub = File::get(base_path('stubs/import.stub'));
 
         $fieldsMapping = implode(",\n            ", array_map(fn($f) => "'{$f}' => \$row['" . strtolower($f) . "']", array_keys($config['fields'])));
@@ -344,7 +412,7 @@ class CrudGeneratorCommand extends Command
 
         $stub = str_replace(
             ['{{ model }}', '{{ fields_mapping }}', '{{ validation_rules }}'],
-            [$name, $fieldsMapping, $validationRules],
+            [$model_name, $fieldsMapping, $validationRules],
             $stub
         );
 
@@ -353,11 +421,12 @@ class CrudGeneratorCommand extends Command
     }
 
 
-    protected function appendRoutes($name, $config)
+    protected function appendRoutes($config)
     {
         $routeFile = base_path('routes/web.php');
-        $route_prefix = $this->routePrefix($name);
-        $controller = $name . 'Controller';
+        $model_name = $config['model'];
+        $route_prefix = $config['route_prefix'];
+        $controller = $model_name . 'Controller';
 
         $routes = [];
         if (!empty($config['excel_import'])) {
@@ -391,9 +460,11 @@ class CrudGeneratorCommand extends Command
         return strtolower(str_replace(" ", "_", $this->modelPluralTitle($modelName)));
     }
 
-    protected function generateViews($name, $config)
+    protected function generateViews($config)
     {
-        $route_prefix = $this->routePrefix($name);
+        $model_name = $config['model'];
+        $route_prefix = $config['route_prefix'];
+
         $viewsDir = resource_path("views/{$route_prefix}");
         File::ensureDirectoryExists($viewsDir);
 
@@ -404,7 +475,7 @@ class CrudGeneratorCommand extends Command
 
             $stubContent = File::get($stubPath);
 
-            $stubContent = $this->replaceViewPlaceholders($stubContent, $name, $config, $route_prefix);
+            $stubContent = $this->replaceViewPlaceholders($stubContent, $model_name, $config, $route_prefix);
 
             File::put($filePath, $stubContent);
         }
@@ -454,10 +525,10 @@ class CrudGeneratorCommand extends Command
     {
         $buttons = '';
         if (!empty($config['excel_import'])) {
-            $buttons .= "<a href=\"{{ route('{$route_prefix}.import') }}\" class=\"btn btn-primary\">Import Excel</a>\n";
+            $buttons .= "<a href=\"{{ route('{$route_prefix}.import') }}\" class=\"btn btn-primary\"><i class=\"bi bi-upload\"></i> Import Excel</a>\n";
         }
         if (!empty($config['excel_export'])) {
-            $buttons .= "<a href=\"{{ route('{$route_prefix}.export') }}\" class=\"btn btn-success\">Export Excel</a>\n";
+            $buttons .= "<a href=\"{{ route('{$route_prefix}.export') }}\" class=\"btn btn-success\"><i class=\"bi bi-download\"></i> Export Excel</a>\n";
         }
         return $buttons;
     }

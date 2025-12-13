@@ -30,7 +30,12 @@
                            Dashboard
                         </a>
                     </li>
-
+                    <li class="nav-item">
+                        <a href="{{ route('stores.index') }}" 
+                           class="nav-link {{ request()->routeIs('stores.*') ? 'active' : '' }}">
+                           Stores
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ route('users.index') }}" 
                            class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">

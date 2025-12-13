@@ -6,6 +6,32 @@ use App\Models\{{ model }};
 
 class {{ model }}Service
 {
+    public function lists($data = null)
+    {
+        $order = "asc";
+
+        $query = {{ model }}::query;
+
+        $query = $query->with([]);
+
+        //filter options
+        {{ filter }}
+
+        if (isset($data["only_query"]) && $data["only_query"]) {
+            return $query;
+        }
+
+        if ($this->paginatedList === true) {
+            $item_per_page = isset($data['item_per_page']) ? $data['item_per_page'] : config('constants.pagination.per_page');
+            ${{ table }} = $query->paginate($item_per_page)->appends($search_query);
+            ${{ table }}->pagination_summary = get_pagination_summary(${{ table }});
+        } else {
+            ${{ table }} = $query->get();
+        }
+
+        return ${{ table }};
+    }
+
     public function create(array $data)
     {
         return {{ model }}::create($data);

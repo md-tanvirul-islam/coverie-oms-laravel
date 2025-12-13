@@ -2,22 +2,22 @@
 
 namespace App\DataTables;
 
-use App\Models\{{ model }};
+use App\Models\Stores;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 
-class {{ model }}sDataTable extends DataTable
+class StoresDataTable extends DataTable
 {
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', '{{ route_prefix }}.action')
+            ->addColumn('action', 'stores.action')
             ->setRowId('id');
     }
 
-    public function query({{ model }} $model)
+    public function query(Stores $model)
     {
         return $model->newQuery();
     }
@@ -25,7 +25,7 @@ class {{ model }}sDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-            ->setTableId('{{ route_prefix }}_table')
+            ->setTableId('stores_table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
@@ -43,12 +43,24 @@ class {{ model }}sDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            {{ tableColumns }}
+            Column::make('user_id'),
+            Column::make('name'),
+            Column::make('slug'),
+            Column::make('type'),
+            Column::make('logo'),
+            Column::make('status'),
+            Column::make('created_by'),
+            Column::make('updated_by'),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->width(60)
+                ->addClass('text-center'),
         ];
     }
 
     protected function filename(): string
     {
-        return '{{ model }}s_' . date('YmdHis');
+        return 'Storess_' . date('YmdHis');
     }
 }
