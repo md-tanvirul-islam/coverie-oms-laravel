@@ -55,7 +55,7 @@ class CrudGeneratorCommand extends Command
         // dd($config);
 
         // 1. Generate Model
-        $this->generateModel($model, $config);
+        $this->generateModel($config);
 
         // 2. Generate Migration
         $this->generateMigration($config);
