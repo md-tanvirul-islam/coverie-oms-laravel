@@ -417,7 +417,7 @@ class CrudGeneratorCommand extends Command
         $model_name = $config['model'];
         $model_plural = Str::plural($model_name);
 
-        $exportPath = app_path("Exports/{$model_plural}sExport.php");
+        $exportPath = app_path("Exports/{$model_plural}Export.php");
         $stub = File::get(base_path('stubs/export.stub'));
 
         $fieldsList = implode(",\n            ", array_map(fn($f) => "'{$f}'", array_keys($config['fields'])));

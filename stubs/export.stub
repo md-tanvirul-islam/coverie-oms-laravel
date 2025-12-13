@@ -6,7 +6,7 @@ use App\Models\{{ model }};
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class {{ model_plural }}sExport implements FromCollection, WithHeadings
+class {{ model_plural }}Export implements FromCollection, WithHeadings
 {
     public function collection()
     {

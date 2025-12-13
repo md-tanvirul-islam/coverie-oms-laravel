@@ -6,7 +6,7 @@ use App\DataTables\{{ models }}DataTable;
 use App\Exports\{{ models }}Export;
 use App\Http\Requests\{{ model }}\Store{{ model }}Request;
 use App\Http\Requests\{{ model }}\Update{{ model }}Request;
-use App\Imports\{{ model }}Import;
+use App\Imports\{{ models }}Import;
 use App\Models\{{ model }};
 use App\Services\{{ model }}Service;
 use Illuminate\Http\Request;
@@ -76,7 +76,7 @@ class {{ model }}Controller extends Controller
         $request->validate(['file' => 'required|file|mimes:xlsx,csv']);
 
         try {
-            $import = new {{ model }}Import;
+            $import = new {{ models }}Import;
             Excel::import($import, $request->file('file'));
 
             if ($import->failures()->isNotEmpty()) {

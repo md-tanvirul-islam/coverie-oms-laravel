@@ -20,7 +20,7 @@ class {{ model_plural }}DataTable extends DataTable
 
     public function query(Filter{{ model }}Request $request, {{ model }}Service $service)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
         return $service->list($data, true);
     }
