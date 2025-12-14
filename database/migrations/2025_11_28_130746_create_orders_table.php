@@ -13,19 +13,14 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('store_id');
+            $table->unsignedBigInteger('moderator_id');
             $table->string('invoice_id')->unique();
             $table->date('order_date');
             $table->string('customer_name');
             $table->string('customer_phone');
             $table->text('customer_address')->nullable();
             $table->decimal('total_cost', 10, 2);
-            $table->string('phone_model');
-
-            // Foreign key to moderators
-            $table->foreignId('moderator_id')
-                ->constrained('moderators')
-                ->onDelete('cascade');
-
             $table->softDeletes();
             $table->timestamps();
         });

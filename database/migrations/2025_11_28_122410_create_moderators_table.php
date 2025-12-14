@@ -18,6 +18,7 @@ return new class extends Migration
             $table->date('joining_date')->nullable();
             $table->string('address')->nullable();
             $table->string('code')->unique();
+            $table->decimal('commission_fee_per_order', 10, 2)->default(0);
             $table->softDeletes();
             $table->timestamps();
         });
