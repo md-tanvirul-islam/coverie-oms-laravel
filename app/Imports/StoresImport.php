@@ -20,7 +20,7 @@ class StoresImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFa
             'name' => $row['name'],
             'type' => $row['type'],
             'status' => $row['status'],
-            'created_by' => Auth::id() ?? null,
+            'created_by' => Auth::id(),
         ]);
     }
 

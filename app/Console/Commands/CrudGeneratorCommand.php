@@ -348,11 +348,11 @@ class CrudGeneratorCommand extends Command
         $stub = File::get(base_path("stubs/controller.stub"));
 
         $createdBy = isset($config['fields']['created_by'])
-            ? "\$data['created_by'] = Auth::id() ?? null;"
+            ? "\$data['created_by'] = Auth::id();"
             : "";
 
         $updatedBy = isset($config['fields']['updated_by'])
-            ? "\$data['updated_by'] = Auth::id() ?? null;"
+            ? "\$data['updated_by'] = Auth::id();"
             : "";
 
         $variable = Str::singular($route_prefix);

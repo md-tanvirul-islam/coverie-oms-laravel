@@ -32,7 +32,7 @@ class StoresController extends Controller
     {
         $data = $request->validated();
 
-        $data['created_by'] = Auth::id() ?? null;
+        $data['created_by'] = Auth::id();
 
         $this->service->create($data);
 
@@ -50,7 +50,7 @@ class StoresController extends Controller
     {
         $data = $request->validated();
 
-        $data['updated_by'] = Auth::id() ?? null;
+        $data['updated_by'] = Auth::id();
 
         $this->service->update($store, $data);
 
