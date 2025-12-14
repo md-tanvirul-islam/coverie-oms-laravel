@@ -31,10 +31,6 @@ class StoreService
             $query->where('type', $data['type']);
         }
 
-        if (isset($data['logo'])) {
-            $query->where('logo', $data['logo']);
-        }
-
         if (array_key_exists('status', $data)) {
             $query->where('status', $data['status']);
         }
@@ -64,12 +60,26 @@ class StoreService
 
     public function create(array $data)
     {
-        return Store::create($data);
+        $store = Store::create($data);
+
+        if (!empty($data['logo']) && $store) {
+
+            $store->logo()->store($data['logo']);
+        }
+
+        return $store;
     }
 
-    public function update(Store $model, array $data)
+    public function update(Store $store, array $data)
     {
-        return $model->update($data);
+        $data = array_filter($data, fn($value) => ! is_null($value));
+
+        if (!empty($data['logo']) && $store) {
+
+            $store->logo()->store($data['logo']);
+        }
+
+        return $store->update($data);
     }
 
     public function delete(Store $model)

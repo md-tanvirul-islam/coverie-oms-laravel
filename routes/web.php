@@ -6,7 +6,7 @@ use App\Http\Controllers\ModeratorController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\StoresController;
+use App\Http\Controllers\StoreController;
 use App\Http\Controllers\UserController;
 // use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
@@ -40,10 +40,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('courier_paid_invoices/export', [CourierPaidInvoiceController::class, 'export'])->name('courier_paid_invoices.export');
     Route::resource('courier_paid_invoices', CourierPaidInvoiceController::class);
 
-    Route::get('stores/import', [StoresController::class, 'import'])->name('stores.import');
-    Route::post('stores/import', [StoresController::class, 'importStore'])->name('stores.import.store');
-    Route::get('stores/export', [StoresController::class, 'export'])->name('stores.export');
-    Route::resource('stores', StoresController::class);
+    Route::get('stores/import', [StoreController::class, 'import'])->name('stores.import');
+    Route::post('stores/import', [StoreController::class, 'importStore'])->name('stores.import.store');
+    Route::get('stores/export', [StoreController::class, 'export'])->name('stores.export');
+    Route::resource('stores', StoreController::class);
 
 
     Route::get('reports/moderator_commission/daily', [ReportController::class, 'moderatorCommissionDailyReport'])

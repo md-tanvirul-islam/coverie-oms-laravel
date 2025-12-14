@@ -14,14 +14,9 @@ class UpdateStoresRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'user_id' => 'required|integer|exists:users,id',
             'name' => 'required|string|max:255|unique:stores,name,'.$this->store->id,
-            'slug' => 'required|string|max:255|unique:stores,slug,'.$this->store->id,
             'type' => 'nullable|string|max:100',
-            'logo' => 'nullable|string|max:255',
             'status' => 'required|boolean',
-            'created_by' => 'nullable|integer',
-            'updated_by' => 'nullable|integer',
         ];
     }
 }

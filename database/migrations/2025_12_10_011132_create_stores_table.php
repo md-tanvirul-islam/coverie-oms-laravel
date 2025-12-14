@@ -13,15 +13,11 @@ return new class extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('user_id');
             $table->string('name', 255);
-            $table->string('slug', 255);
             $table->string('type', 255);
-            $table->string('logo', 255);
             $table->boolean('status');
-            $table->unsignedBigInteger('created_by');
-            $table->unsignedBigInteger('updated_by');
-
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
 
             $table->softDeletes();
             $table->timestamps();

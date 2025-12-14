@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e3c865866250158cc1205524f5d768f5",
+    "content-hash": "950123800f051e3a004de4066eb23bd3",
     "packages": [
         {
             "name": "brick/math",
@@ -1612,6 +1612,70 @@
                 "source": "https://github.com/laravel/tinker/tree/v2.10.2"
             },
             "time": "2025-11-20T16:29:12+00:00"
+        },
+        {
+            "name": "laraveljutsu/laravel-artifact",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ludoguenet/laravel-artifact.git",
+                "reference": "5120286473b068c0bc051dbfeba4b1bf520420d4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ludoguenet/laravel-artifact/zipball/5120286473b068c0bc051dbfeba4b1bf520420d4",
+                "reference": "5120286473b068c0bc051dbfeba4b1bf520420d4",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/console": "^10.0|^11.0|^12.0",
+                "illuminate/database": "^10.0|^11.0|^12.0",
+                "illuminate/support": "^10.0|^11.0|^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "laravel/pint": "^1.16",
+                "nunomaduro/larastan": "^2.9",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^2.34",
+                "pestphp/pest-plugin-laravel": "^2.4",
+                "phpstan/phpstan": "^1.11"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelJutsu\\Artifact\\ArtifactServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelJutsu\\Artifact\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "ludoguenet",
+                    "email": "ludovicguenet@gmx.com"
+                }
+            ],
+            "description": "Artifact — Lightweight package that just handles basic media management with no fuss.",
+            "keywords": [
+                "artifact",
+                "laravel",
+                "management",
+                "media"
+            ],
+            "support": {
+                "issues": "https://github.com/ludoguenet/laravel-artifact/issues",
+                "source": "https://github.com/ludoguenet/laravel-artifact/tree/v1.0.0"
+            },
+            "time": "2025-08-25T21:28:58+00:00"
         },
         {
             "name": "league/commonmark",

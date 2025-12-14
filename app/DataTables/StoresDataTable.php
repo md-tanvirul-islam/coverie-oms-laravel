@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Enums\AppModelStatus;
 use App\Http\Requests\Store\FilterStoreRequest;
 use App\Services\StoreService;
 use Yajra\DataTables\Services\DataTable;
@@ -14,15 +15,16 @@ class StoresDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('status', fn($row) => array_flip(AppModelStatus::options())[$row->status] ?? '')
             ->addColumn('action', 'stores.action')
             ->setRowId('id');
     }
 
-    public function query(FilterStoreRequest $request, StoreService $storeService)
+    public function query(FilterStoreRequest $request, StoreService $service)
     {
-        $data = $request->all();
+        $data = $request->validated();
 
-        return $storeService->list($data, true);
+        return $service->list($data, true);
     }
 
     public function html()
@@ -46,14 +48,9 @@ class StoresDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('user_id'),
             Column::make('name'),
-            Column::make('slug'),
             Column::make('type'),
-            Column::make('logo'),
             Column::make('status'),
-            Column::make('created_by'),
-            Column::make('updated_by'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)

@@ -1,49 +1,53 @@
 @extends('layouts.app')
 
 @section('content')
-<h4 class="mb-3">Edit Stores</h4>
+    <h4 class="mb-3">Edit Store</h4>
 
-<div class="card shadow-sm p-4">
-    <form method="POST" action="{{ route('stores.update', $store->id) }}">
-        @csrf
-        @method('PUT')
-
-        <div class="mb-3">
-                    <label class="form-label">User Id</label>
-                    <input type="text" name="user_id" class="form-control" value="{{ $store->user_id }}">
-                </div>
-<div class="mb-3">
-                    <label class="form-label">Name</label>
-                    <input type="text" name="name" class="form-control" value="{{ $store->name }}">
-                </div>
-<div class="mb-3">
-                    <label class="form-label">Slug</label>
-                    <input type="text" name="slug" class="form-control" value="{{ $store->slug }}">
-                </div>
-<div class="mb-3">
-                    <label class="form-label">Type</label>
-                    <input type="text" name="type" class="form-control" value="{{ $store->type }}">
-                </div>
-<div class="mb-3">
-                    <label class="form-label">Logo</label>
-                    <input type="text" name="logo" class="form-control" value="{{ $store->logo }}">
-                </div>
-<div class="form-check mb-3">
-                        <input type="checkbox" name="status" class="form-check-input" value="1" {{ $store->status ? 'checked' : '' }}>
-                        <label class="form-check-label">Status</label>
+    <div class="card shadow-sm p-4">
+        <form method="POST" action="{{ route('stores.update', $store->id) }}" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
+            <div class="mb-3">
+                <label class="form-label">Name</label>
+                <input type="text" name="name" class="form-control" value="{{ old('name', $store->name) }}">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Type</label>
+                <x-dropdowns.select-store-type name="type" :selected="old('type', $store->type)" />
+            </div>
+            <div class="mb-3">
+                <label class="form-check-label">Status</label>
+                <x-radio-inputs.app-model-status name="status" :checked="old('status', $store->status)" />
+            </div>
+            <div class="mb-3">
+                <label for="logo" class="form-label">
+                    Logo <small class="text-muted">(leave empty to keep existing)</small>
+                </label>
+                <input type="file" id="logo" class="form-control" name="logo" onchange="previewLogo(event)">
+                <img id="logoPreview" class="mt-2 img-thumbnail d-none" style="max-height:120px;">
+            </div>
+            <div class="mb-3">
+                @if ($store->logo)
+                    <div class="mb-3">
+                        <label class="form-label d-block">Current Logo</label>
+                        <img src="{{ $store->logo->temporarySignedUrl() }}" alt="Store Logo" class="img-thumbnail"
+                            style="max-height: 120px;">
                     </div>
-<div class="mb-3">
-                    <label class="form-label">Created By</label>
-                    <input type="text" name="created_by" class="form-control" value="{{ $store->created_by }}">
-                </div>
-<div class="mb-3">
-                    <label class="form-label">Updated By</label>
-                    <input type="text" name="updated_by" class="form-control" value="{{ $store->updated_by }}">
-                </div>
+                @endif
+            </div>
 
-
-        <button class="btn btn-primary">Update</button>
-        <a href="{{ route('stores.index') }}" class="btn btn-secondary">Back</a>
-    </form>
-</div>
+            <button class="btn btn-primary">Update</button>
+            <a href="{{ route('stores.index') }}" class="btn btn-secondary">Back</a>
+        </form>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function previewLogo(event) {
+            const img = document.getElementById('logoPreview');
+            img.src = URL.createObjectURL(event.target.files[0]);
+            img.classList.remove('d-none');
+        }
+    </script>
+@endpush
