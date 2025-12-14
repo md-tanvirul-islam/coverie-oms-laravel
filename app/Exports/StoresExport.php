@@ -2,27 +2,44 @@
 
 namespace App\Exports;
 
-use App\Models\Store;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Enums\StoreType;
+use App\Http\Requests\Store\FilterStoreRequest;
+use App\Services\StoreService;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
+use Maatwebsite\Excel\Concerns\WithMapping;
 
-class StoresExport implements FromCollection, WithHeadings
+class StoresExport implements FromQuery, WithHeadings, WithMapping
 {
-    public function collection()
+    private $storeService;
+    public function __construct(public $filter_data = [])
     {
-        return Store::all([
-            'name',
-            'type',
-            'status'
-        ]);
+        $this->storeService = new StoreService;
+    }
+
+    public function query()
+    {
+        return $this->storeService->list($this->filter_data, true);
+    }
+
+    /**
+     * Map each row before export
+     */
+    public function map($store): array
+    {
+        return [
+            $store->name,
+            StoreType::options()[$store->type] ?? '—',
+            $store->status ? 'Active' : 'Inactive',
+        ];
     }
 
     public function headings(): array
     {
         return [
-            'name',
-            'type',
-            'status'
+            'Name',
+            'Type',
+            'Status',
         ];
     }
 }

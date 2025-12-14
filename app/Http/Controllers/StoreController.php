@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DataTables\StoresDataTable;
 use App\Exports\StoresExport;
+use App\Http\Requests\Store\FilterStoreRequest;
 use App\Http\Requests\Store\StoreStoreRequest;
 use App\Http\Requests\Store\UpdateStoreRequest;
 use App\Imports\StoresImport;
@@ -102,8 +103,8 @@ class StoreController extends Controller
         }
     }
 
-    public function export()
+    public function export(FilterStoreRequest $request)
     {
-        return Excel::download(new StoresExport, 'Stores.xlsx');
+        return Excel::download(new StoresExport($request->validated()), 'Stores.xlsx');
     }
 }

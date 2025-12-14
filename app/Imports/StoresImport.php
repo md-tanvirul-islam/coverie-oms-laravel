@@ -2,8 +2,11 @@
 
 namespace App\Imports;
 
+use App\Enums\AppModelStatus;
+use App\Enums\StoreType;
 use App\Models\Store;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
@@ -27,9 +30,9 @@ class StoresImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnFa
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:stores,name',
-            'type' => 'nullable|string|max:100',
-            'status' => 'required|boolean',
+            'name'   => ['required', 'string', 'max:255', 'unique:stores,name'],
+            'type'   => ['nullable', Rule::in(StoreType::values())],
+            'status' => ['required', Rule::in(AppModelStatus::values())],
         ];
     }
 }
