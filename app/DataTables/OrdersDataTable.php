@@ -14,6 +14,7 @@ class OrdersDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('store', fn($row) => $row->store?->name ?? '-')
             ->addColumn('moderator', fn($row) => $row->moderator?->name_and_code ?? '-')
             ->addColumn('action', 'orders.action')
             ->setRowId('id');
@@ -21,7 +22,7 @@ class OrdersDataTable extends DataTable
 
     public function query(Order $model): Builder
     {
-        return $model->with('moderator')->newQuery();
+        return $model->with(['moderator:id,name,code', 'store:id,name'])->newQuery();
     }
 
         public function html()
@@ -46,6 +47,7 @@ class OrdersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
+            Column::make('store'),
             Column::make('invoice_id'),
             Column::make('order_date'),
             Column::make('customer_name'),

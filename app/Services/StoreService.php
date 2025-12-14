@@ -91,4 +91,9 @@ class StoreService
     {
         return Store::findOrFail($id);
     }
+
+    public function dropdown()
+    {
+        return Store::pluck('name', 'id')->toArray();
+    }
 }

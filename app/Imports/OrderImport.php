@@ -4,6 +4,7 @@ namespace App\Imports;
 
 use App\Models\Moderator;
 use App\Models\Order;
+use App\Models\Store;
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -50,9 +51,11 @@ class OrderImport implements
             $customerPhone = (string) $customerPhone;
         }
 
-        $moderator = Moderator::where('code', $row['order_taken_by'])->first();
+        $store = Store::where('name', $row['store'])->first(['id']);
+        $moderator = Moderator::where('code', $row['order_taken_by'])->first(['id']);
 
         return new Order([
+            'moderator_id'     => $store?->id,
             'invoice_id'       => (string) $row['invoice_id'],
             'order_date'       => $orderDate,
             'customer_name'    => $row['customer_name'],
@@ -68,6 +71,7 @@ class OrderImport implements
     public function rules(): array
     {
         return [
+            '*.store'            => 'required|exists:stores,name',
             '*.invoice_id'       => ['required', 'string', Rule::unique('orders', 'invoice_id')],
             '*.order_date'       => ['required', function ($attribute, $value, $fail) {
 

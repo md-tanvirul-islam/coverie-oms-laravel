@@ -22,6 +22,7 @@ class UpdateOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'store_id'       => 'required|exists:stores,id',
             'invoice_id'       => 'required|string|max:50|unique:orders,invoice_id,' . $this->order->id,
             'order_date'       => 'required|date',
             'customer_name'    => 'required|string|max:255',

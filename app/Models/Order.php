@@ -10,6 +10,7 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'store_id',
         'invoice_id',
         'order_date',
         'customer_name',
@@ -20,6 +21,11 @@ class Order extends Model
         'moderator_id',
         'quantity',
     ];
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function moderator()
     {

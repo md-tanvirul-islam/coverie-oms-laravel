@@ -28,6 +28,7 @@
                             <li>Only <b>.xlsx</b> or <b>.csv</b> files are allowed.</li>
                             <li>Your Excel file must contain the following columns:</li>
                             <ul>
+                                <li>STORE</li>
                                 <li>INVOICE_ID</li>
                                 <li>ORDER_DATE</li>
                                 <li>CUSTOMER_NAME</li>

@@ -9,18 +9,30 @@
             <div class="mb-3">
                 <label class="form-label">Name</label>
                 <input type="text" name="name" class="form-control" value="{{ old('name') }}">
+                @error('name')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label class="form-label">Type</label>
                 <x-dropdowns.select-store-type name="type" :selected="old('type')" />
+                @error('type')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label class="form-check-label">Status</label>
                 <x-radio-inputs.app-model-status name="status" :checked="old('status')" />
+                @error('status')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
             </div>
             <div class="mb-3">
                 <label for="logo" class="form-label">Logo:</label>
                 <input type="file" id="logo" class="form-control" name="logo" onchange="previewLogo(event)">
+                @error('logo')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
                 <img id="logoPreview" class="mt-2 img-thumbnail d-none" style="max-height:120px;">
             </div>
             <button class="btn btn-primary">Create</button>
