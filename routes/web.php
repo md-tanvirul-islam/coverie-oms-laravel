@@ -6,6 +6,7 @@ use App\Http\Controllers\ModeratorController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
@@ -29,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // });
 
     Route::resource('users', UserController::class);
+    Route::resource('roles', RoleController::class);
     Route::resource('moderators', ModeratorController::class);
 
     Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');

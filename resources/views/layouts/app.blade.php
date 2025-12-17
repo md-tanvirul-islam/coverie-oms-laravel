@@ -52,6 +52,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('roles.index') }}"
+                                    class="nav-link {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                                    Roles
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="{{ route('moderators.index') }}"
                                     class="nav-link {{ request()->routeIs('moderators.*') ? 'active' : '' }}">
                                     Moderators
