@@ -92,7 +92,8 @@ class DashboardService
         if ($from) $q->whereDate('order_date', '>=', $from);
         if ($to)   $q->whereDate('order_date', '<=', $to);
 
-        return (int) $q->sum('quantity');
+        // return (int) $q->sum('quantity');
+        return (int) $q->count();
     }
 
     /**
@@ -103,7 +104,8 @@ class DashboardService
         $q = CourierPaidInvoice::query()
             ->where('invoice_type', PaidInvoiceType::TYPE_RETURN)
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
-            ->selectRaw('COALESCE(SUM(orders.quantity),0) as total');
+            // ->selectRaw('COALESCE(SUM(orders.quantity),0) as total');
+            ->selectRaw('COALESCE(COUNT(orders.id),0) as total');
 
         if ($from) $q->whereDate('courier_paid_invoices.created_date', '>=', $from);
         if ($to)   $q->whereDate('courier_paid_invoices.created_date', '<=', $to);
@@ -119,7 +121,8 @@ class DashboardService
         $q = CourierPaidInvoice::query()
             ->where('invoice_type', PaidInvoiceType::TYPE_DELIVERY)
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
-            ->selectRaw('COALESCE(SUM(orders.quantity),0) as total');
+            // ->selectRaw('COALESCE(SUM(orders.quantity),0) as total');
+            ->selectRaw('COALESCE(COUNT(orders.id),0) as total');
 
         if ($from) $q->whereDate('courier_paid_invoices.created_date', '>=', $from);
         if ($to)   $q->whereDate('courier_paid_invoices.created_date', '<=', $to);

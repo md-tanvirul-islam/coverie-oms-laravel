@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum SystemDefinedRole: string
 {
-    case PRODUCT = 'PRODUCT';
+    case OWNER = 'OWNER';
     case ADMIN = 'ADMIN';
-    case STAFF = 'STAFF';
+    case MODERATOR = 'MODERATOR';
 
     /**
      * Return all values
