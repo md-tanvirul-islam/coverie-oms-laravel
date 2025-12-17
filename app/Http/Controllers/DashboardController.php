@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Enums\SystemDefinedRole;
 
 class DashboardController extends Controller
 {
@@ -21,6 +22,18 @@ class DashboardController extends Controller
 
     public function dashboard(Request $request)
     {
+        // dd(
+        //     Auth::user()->roles()->toSql(), 
+        //     Auth::user()->roles()->getBindings(), 
+        //     session('team_id'), 
+        //     Auth::user()->team->id,
+        //     Auth::user()->roles, 
+        // );
+
+        if (Auth::user()->hasRole(SystemDefinedRole::ADMIN)) {
+            return view('dashboard');
+        }
+
         $mode = $request->get('mode', 'days'); // 'days' or 'months'
         $from = $request->get('from');
         $to   = $request->get('to');

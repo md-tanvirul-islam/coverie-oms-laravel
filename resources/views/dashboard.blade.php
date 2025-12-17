@@ -10,10 +10,15 @@
             </div>
         </div>
 
-        {{-- Statics Card --}}
-        <livewire:statistic-cards />    
 
-        {{-- Collected Amount Bar Char --}}
-        <livewire:collected-amount-bar-chart />
+        @role(\App\Enums\SystemDefinedRole::ADMIN)
+        @else
+            {{-- Statics Card --}}
+            <livewire:statistic-cards />
+
+            {{-- Collected Amount Bar Char --}}
+            <livewire:collected-amount-bar-chart />
+        @endrole
+
     </div>
 @endsection

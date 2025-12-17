@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 // use App\Livewire\Dashboard;
 use Illuminate\Support\Facades\Route;
@@ -51,6 +52,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('reports/moderator_commission/monthly', [ReportController::class, 'moderatorCommissionMonthlyReport'])
         ->name('reports.moderator_commission.monthly');
+
+    //super-admin
+    Route::get('teams/import', [TeamController::class, 'import'])->name('teams.import');
+    Route::post('teams/import', [TeamController::class, 'importStore'])->name('teams.import.store');
+    Route::get('teams/export', [TeamController::class, 'export'])->name('teams.export');
+    Route::resource('teams', TeamController::class);
 });
 
 require __DIR__ . '/auth.php';
