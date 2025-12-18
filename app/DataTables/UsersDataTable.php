@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -15,6 +16,9 @@ class UsersDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('roles', fn($row) => implode(',', $row->roles->pluck('name')->toArray()))
+            ->addColumn('created_at', fn($row) => Carbon::parse($row->created_at)->toDateTimeString())
+            ->addColumn('updated_at', fn($row) => Carbon::parse($row->updated_at)->toDateTimeString())
             ->addColumn('action', 'users.action')
             ->setRowId('id');
     }
@@ -45,9 +49,10 @@ class UsersDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id'),
+            // Column::make('id'),
             Column::make('name'),
             Column::make('email'),
+            Column::make('roles'),
             Column::make('created_at'),
             Column::make('updated_at'),
             Column::computed('action')
