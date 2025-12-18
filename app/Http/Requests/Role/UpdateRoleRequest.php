@@ -28,6 +28,12 @@ class UpdateRoleRequest extends FormRequest
                     ))
                     ->ignore($roleId),
             ],
+
+            'permissions' => ['required', 'array'],
+
+            'permissions.*' => [
+                'exists:permissions,name'
+            ]
         ];
     }
 }

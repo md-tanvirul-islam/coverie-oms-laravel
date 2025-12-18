@@ -16,11 +16,9 @@ class RoleService
 
     public function update(Role $role, array $data)
     {
-        if (isset($data['name'])) {
-            $role->name  = $data['name'];
-        }
-
-        return $role->save();
+        $data = array_filter($data, fn($value) => !is_null($value));
+        
+        return $role->update($data);
     }
 
     public function delete(Role $role)

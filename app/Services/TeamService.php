@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\SystemDefinedRole;
+use App\Enums\SystemPermission;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
@@ -97,10 +98,14 @@ class TeamService
                 'team_id' => $team->id,
             ]);
 
-            Role::updateOrCreate([
+            $ownerRole->syncPermissions(SystemPermission::newOwnerPermissions());
+
+            $moderatorRole = Role::updateOrCreate([
                 'name'    => SystemDefinedRole::MODERATOR,
                 'team_id' => $team->id,
             ]);
+
+            $moderatorRole->syncPermissions(SystemPermission::newModeratorPermissions());
 
             $user = User::updateOrCreate(
                 ['email' => $email],

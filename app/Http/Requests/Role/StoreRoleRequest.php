@@ -14,6 +14,7 @@ class StoreRoleRequest extends FormRequest
 
     public function rules(): array
     {
+
         return [
             'name' => [
                 'required',
@@ -25,6 +26,12 @@ class StoreRoleRequest extends FormRequest
                         session('team_id')
                     )),
             ],
+
+            'permissions' => ['required', 'array'],
+
+            'permissions.*' => [
+                'exists:permissions,name'
+            ]
         ];
     }
 }

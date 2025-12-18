@@ -58,4 +58,26 @@ enum SystemPermission: string
     {
         return array_filter(self::values(), fn($perm) => str_starts_with($perm, strtolower($module) . '.'));
     }
+
+    public static function newOwnerPermissions(): array
+    {
+        $excluded = [];
+
+        return collect(self::values())
+            ->reject(fn($permission) => in_array($permission, $excluded, true))
+            ->values()
+            ->toArray();
+    }
+
+    public static function newModeratorPermissions(): array
+    {
+        $permissions = [
+            self::ORDER_READ,
+            self::ORDER_CREATE,
+            self::ORDER_UPDATE,
+            self::ORDER_DELETE,
+        ];
+
+        return array_map(fn($permission) => $permission->value, $permissions);
+    }
 }

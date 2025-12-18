@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
+
 function get_pagination_summary($data)
 {
     $total_item = $data->total();
@@ -23,4 +25,27 @@ function get_pagination_summary($data)
         }
     }
     return $pagination_summary;
+}
+
+
+function log_exception(Throwable $e, string $context, array $extra = []): void
+{
+    $file = $e->getFile();
+    $line = $e->getLine();
+
+    $codeLine = null;
+    if (is_readable($file)) {
+        $lines = file($file);
+        $codeLine = $lines[$line - 1] ?? null;
+    }
+
+    Log::error($context, [
+        'exception' => class_basename($e),
+        'message'   => $e->getMessage(),
+        'file'      => $file,
+        'line'      => $line,
+        'code'      => trim((string) $codeLine),
+        'trace'     => collect($e->getTrace())->take(10)->all(), // limit noise
+        'extra'     => $extra,
+    ]);
 }
