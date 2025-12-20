@@ -40,7 +40,7 @@
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
-                <x-dropdowns.select-role name="roles[]" :selected="$roles" multiple />
+                <x-dropdowns.select-role name="role_ids[]" :selected="$roles" multiple />
                 @error('roles')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror

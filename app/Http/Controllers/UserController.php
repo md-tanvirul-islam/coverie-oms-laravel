@@ -42,6 +42,10 @@ class UserController extends Controller
     {
         $this->service->update($user, $request->validated());
 
+        $roles = Role::whereIn('id', $request->role_ids)->get();
+
+        $user->syncRoles($roles);
+
         return redirect()
             ->route('users.index')
             ->with('success', 'User updated.');
