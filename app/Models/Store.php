@@ -32,4 +32,9 @@ class Store extends Model
     {
         return $this->belongsTo(User::class, 'updated_by');
     }
+
+    public function users()
+    {
+        return $this->belongsToMany(Store::class, UserPermittedStore::class, 'user_id', 'store_id');
+    }
 }

@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('{{ table }}', function (Blueprint $table) {
+        Schema::create('user_permitted_stores', function (Blueprint $table) {
             $table->id();
-{{ fields }}
-            $table->softDeletes();
+            $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('store_id');
+            $table->boolean('full_data');
             $table->timestamps();
         });
-        
-{{ relations }}
     }
 
     /**
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('{{ table }}');
+        Schema::dropIfExists('user_permitted_stores');
     }
 };

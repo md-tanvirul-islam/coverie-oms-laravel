@@ -52,4 +52,8 @@ class User extends Authenticatable
     public function team(){
         return $this->belongsTo(Team::class);
     }
+
+    public function stores(){
+        return $this->belongsToMany(Store::class, UserPermittedStore::class, 'user_id', 'store_id');
+    }
 }
