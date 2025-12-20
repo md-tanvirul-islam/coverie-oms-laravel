@@ -15,7 +15,7 @@ Alpine.start()
 
 function initSelect2() {
     if (typeof $.fn.select2 === 'function') {
-        $('select').select2({
+        $('.select2').select2({
             width: '100%'
         })
     }

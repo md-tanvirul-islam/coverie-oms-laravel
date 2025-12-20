@@ -45,7 +45,38 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-            
+
+            {{-- Stores --}}
+            <div class="mb-3">
+                <label class="form-label">Stores </label>
+                <x-dropdowns.select-store name="store_ids[]" multiple />
+                @error('store_ids')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Full Data --}}
+            <div class="mb-3">
+                <label class="form-label">Data Visibility </label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-yes" value="1">
+                    <label class="form-check-label" for="data-visibility-yes">
+                        Full Data
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-no"
+                        value="0>
+                    <label class="form-check-label" for="data-visibility-no">
+                    Own Data
+                    </label>
+                </div>
+
+                @error('roles')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             <button class="btn btn-primary">Create</button>
             <a href="{{ route('users.index') }}" class="btn btn-secondary">Back</a>
         </form>

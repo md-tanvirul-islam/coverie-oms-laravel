@@ -32,9 +32,20 @@ class UserController extends Controller
 
         $user = $this->service->create($data);
 
-        $roles = Role::whereIn('id', $request->role_ids)->get();
+        $roles = Role::whereIn('id', $data['role_ids'])->get();
 
         $user->syncRoles($roles);
+
+        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
+            return [
+                $store_id => [
+                    'team_id'   => $data['team_id'],
+                    'full_data' => $data['full_data'] ?? null,
+                ],
+            ];
+        })->toArray();
+
+        $user->stores()->sync($storePivotData);
 
         return redirect()
             ->route('users.index')
@@ -48,9 +59,24 @@ class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user)
     {
-        $this->service->update($user, $request->validated());
+        $data = $request->validated();
 
-        $roles = Role::whereIn('id', $request->role_ids)->get();
+        $this->service->update($user, $data);
+
+        $roles = Role::whereIn('id', $data['role_ids'])->get();
+
+        $user->syncRoles($roles);
+
+        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
+            return [
+                $store_id => [
+                    'team_id'   => $data['team_id'],
+                    'full_data' => $data['full_data'] ?? null,
+                ],
+            ];
+        })->toArray();
+
+        $user->stores()->sync($storePivotData);
 
         $user->syncRoles($roles);
 
