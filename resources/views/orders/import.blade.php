@@ -36,7 +36,7 @@
                                 <li>CUSTOMER_ADDRESS</li>
                                 <li>TOTAL_COST</li>
                                 <li>PHONE_MODEL</li>
-                                <li>ORDER_TAKEN_BY (Moderator Code)</li>
+                                <li>ORDER_TAKEN_BY (Employee Code)</li>
                             </ul>
                             <li>Each row will be validated during import.</li>
                             <li>If any row has an error, you will see detailed feedback.</li>

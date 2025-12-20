@@ -18,7 +18,7 @@ class Order extends Model
         'customer_address',
         'total_cost',
         'phone_model',
-        'moderator_id',
+        'employee_id',
         'quantity',
     ];
 
@@ -27,8 +27,8 @@ class Order extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function moderator()
+    public function employee()
     {
-        return $this->belongsTo(Moderator::class);
+        return $this->belongsTo(Employee::class);
     }
 }

@@ -95,18 +95,18 @@
                 @enderror
             </div>
 
-            {{-- Order Taken By (Moderator) --}}
+            {{-- Order Taken By (Employee) --}}
             <div class="mb-3">
                 <label class="form-label">Order Taken By</label>
-                <select name="moderator_id" class="form-control @error('moderator_id') is-invalid @enderror" required>
-                    <option value="">Select Moderator</option>
-                    @foreach ($moderators as $id => $name)
-                        <option value="{{ $id }}" {{ old('moderator_id') == $id ? 'selected' : '' }}>
+                <select name="employee_id" class="form-control @error('employee_id') is-invalid @enderror" required>
+                    <option value="">Select Employee</option>
+                    @foreach ($employees as $id => $name)
+                        <option value="{{ $id }}" {{ old('employee_id') == $id ? 'selected' : '' }}>
                             {{ $name }}
                         </option>
                     @endforeach
                 </select>
-                @error('moderator_id')
+                @error('employee_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

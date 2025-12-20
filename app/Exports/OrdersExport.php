@@ -17,7 +17,7 @@ class OrdersExport implements
     public function collection()
     {
         return Order::query()
-            ->with(['moderator:id,name,code', 'store:id,name'])
+            ->with(['employee:id,name,code', 'store:id,name'])
             ->get();
     }
 
@@ -49,8 +49,8 @@ class OrdersExport implements
             $order->customer_address,
             $order->total_cost,
             $order->phone_model,
-            optional($order->moderator)->code,
-            optional($order->moderator)->name_and_code,
+            optional($order->employee)->code,
+            optional($order->employee)->name_and_code,
             $order->created_at,
         ];
     }

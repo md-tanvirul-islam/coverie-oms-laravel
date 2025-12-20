@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name', 255);
             $table->string('type', 255);
             $table->boolean('status');
+            $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
 

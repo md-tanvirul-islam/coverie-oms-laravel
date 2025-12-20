@@ -14,7 +14,7 @@ class CourierPaidInvoicesDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('moderator', fn($row) => $row->order?->moderator?->name_and_code ?? '-')
+            ->addColumn('employee', fn($row) => $row->order?->employee?->name_and_code ?? '-')
             ->addColumn('action', 'courier_paid_invoices.action')
             ->editColumn('created_date', fn($row) => $row->created_date?->format('Y-m-d H:i') ?? '-')
             ->setRowId('id');
@@ -22,9 +22,9 @@ class CourierPaidInvoicesDataTable extends DataTable
 
     public function query(CourierPaidInvoice $model): Builder
     {
-        // Eager load related order and moderator
+        // Eager load related order and employee
         return $model->with([
-            'order.moderator'
+            'order.employee'
         ])->newQuery();
     }
 
@@ -66,7 +66,7 @@ class CourierPaidInvoicesDataTable extends DataTable
             Column::make('promo_discount'),
             Column::make('payout'),
             Column::make('merchant_order_id'),
-            Column::computed('moderator')
+            Column::computed('employee')
                 ->title('Order Taken By')
                 ->exportable(true)
                 ->printable(true),

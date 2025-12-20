@@ -2,7 +2,7 @@
 
 use App\Http\Controllers\CourierPaidInvoiceController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ModeratorController;
+use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -31,7 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('users', UserController::class);
     Route::resource('roles', RoleController::class);
-    Route::resource('moderators', ModeratorController::class);
+    Route::resource('employees', EmployeeController::class);
 
     Route::get('orders/import', [OrderController::class, 'import'])->name('orders.import');
     Route::post('orders/import', [OrderController::class, 'importStore'])->name('orders.import.store');
@@ -49,11 +49,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('stores', StoreController::class);
 
 
-    Route::get('reports/moderator_commission/daily', [ReportController::class, 'moderatorCommissionDailyReport'])
-        ->name('reports.moderator_commission.daily');
+    Route::get('reports/employee_commission/daily', [ReportController::class, 'employeeCommissionDailyReport'])
+        ->name('reports.employee_commission.daily');
 
-    Route::get('reports/moderator_commission/monthly', [ReportController::class, 'moderatorCommissionMonthlyReport'])
-        ->name('reports.moderator_commission.monthly');
+    Route::get('reports/employee_commission/monthly', [ReportController::class, 'employeeCommissionMonthlyReport'])
+        ->name('reports.employee_commission.monthly');
 
     //super-admin
     Route::get('teams/import', [TeamController::class, 'import'])->name('teams.import');

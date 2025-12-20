@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 
-class Moderator extends Model
+class Employee extends Model
 {
     protected $fillable = [
         'name',

@@ -2,28 +2,28 @@
 
 namespace App\Services;
 
-use App\Models\Moderator;
+use App\Models\Employee;
 
-class ModeratorService
+class EmployeeService
 {
     public function create(array $data)
     {
-        return Moderator::create($data);
+        return Employee::create($data);
     }
 
-    public function update(Moderator $moderator, array $data)
+    public function update(Employee $employee, array $data)
     {
-        return $moderator->update($data);
+        return $employee->update($data);
     }
 
-    public function delete(Moderator $moderator)
+    public function delete(Employee $employee)
     {
-        return $moderator->delete();
+        return $employee->delete();
     }
 
     public function dropdown()
     {
-        return Moderator::select('id', 'name', 'code')
+        return Employee::select('id', 'name', 'code')
             ->get()
             ->mapWithKeys(function ($mod) {
                 return [

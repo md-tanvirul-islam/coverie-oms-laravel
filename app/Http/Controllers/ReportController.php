@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\ModeratorCommissionReportDataTable;
+use App\DataTables\EmployeeCommissionReportDataTable;
 use App\Enums\PaidInvoiceType;
 use App\Models\CourierPaidInvoice;
 use Illuminate\Http\Request;
@@ -10,12 +10,12 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
-    // public function moderatorCommissionReport(ModeratorCommissionReportDataTable $dataTable)
+    // public function employeeCommissionReport(EmployeeCommissionReportDataTable $dataTable)
     // {
-    //     return $dataTable->render('reports.moderator_commission_datatable');
+    //     return $dataTable->render('reports.employee_commission_datatable');
     // }
 
-    public function moderatorCommissionDailyReport(Request $request)
+    public function employeeCommissionDailyReport(Request $request)
     {
         $request->validate([
             'from' => 'nullable|date',
@@ -27,17 +27,17 @@ class ReportController extends Controller
 
         $query = CourierPaidInvoice::query()
             ->select([
-                'moderators.id as moderator_id',
-                'moderators.name',
-                'moderators.code',
+                'employees.id as employee_id',
+                'employees.name',
+                'employees.code',
                 'orders.order_date',
                 DB::raw('SUM(orders.quantity) as total_quantity'),
-                DB::raw('SUM(orders.quantity * moderators.commission_fee_per_order) as total_commission')
+                DB::raw('SUM(orders.quantity * employees.commission_fee_per_order) as total_commission')
             ])
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
-            ->join('moderators', 'moderators.id', '=', 'orders.moderator_id')
+            ->join('employees', 'employees.id', '=', 'orders.employee_id')
             ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::TYPE_DELIVERY)
-            ->groupBy('orders.order_date', 'moderators.id');
+            ->groupBy('orders.order_date', 'employees.id');
 
         if ($from) {
             $query->whereDate('orders.order_date', '>=', $from);
@@ -49,10 +49,10 @@ class ReportController extends Controller
 
         $reports = $query->paginate(50);
 
-        return view('reports.moderator_commission_daily', compact('reports'));
+        return view('reports.employee_commission_daily', compact('reports'));
     }
 
-    public function moderatorCommissionMonthlyReport(Request $request)
+    public function employeeCommissionMonthlyReport(Request $request)
     {
         $request->validate([
             'from' => 'nullable|date',
@@ -64,18 +64,18 @@ class ReportController extends Controller
 
         $query = CourierPaidInvoice::query()
             ->select([
-                'moderators.id as moderator_id',
-                'moderators.name',
-                'moderators.code',
+                'employees.id as employee_id',
+                'employees.name',
+                'employees.code',
                 DB::raw("YEAR(orders.order_date) as order_year"),
                 DB::raw("MONTH(orders.order_date) as order_month"),
                 DB::raw('SUM(orders.quantity) as total_quantity'),
-                DB::raw('SUM(orders.quantity * moderators.commission_fee_per_order) as total_commission')
+                DB::raw('SUM(orders.quantity * employees.commission_fee_per_order) as total_commission')
             ])
             ->join('orders', 'orders.id', '=', 'courier_paid_invoices.order_id')
-            ->join('moderators', 'moderators.id', '=', 'orders.moderator_id')
+            ->join('employees', 'employees.id', '=', 'orders.employee_id')
             ->where('courier_paid_invoices.invoice_type', PaidInvoiceType::TYPE_DELIVERY)
-            ->groupBy('moderators.id', DB::raw("YEAR(orders.order_date)"), DB::raw("MONTH(orders.order_date)"))
+            ->groupBy('employees.id', DB::raw("YEAR(orders.order_date)"), DB::raw("MONTH(orders.order_date)"))
             ->orderBy('order_year')
             ->orderBy('order_month');
 
@@ -89,6 +89,6 @@ class ReportController extends Controller
 
         $reports = $query->paginate(50);
 
-        return view('reports.moderator_commission_monthly', compact('reports'));
+        return view('reports.employee_commission_monthly', compact('reports'));
     }
 }

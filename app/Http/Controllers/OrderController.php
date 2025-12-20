@@ -9,7 +9,7 @@ use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Imports\OrderImport;
 use App\Services\OrderService;
 use App\Models\Order;
-use App\Services\ModeratorService;
+use App\Services\EmployeeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
@@ -23,10 +23,10 @@ class OrderController extends Controller
         return $dataTable->render('orders.index');
     }
 
-    public function create(ModeratorService $moderatorService)
+    public function create(EmployeeService $employeeService)
     {
-        $moderators = $moderatorService->dropdown();
-        return view('orders.create', compact('moderators'));
+        $employees = $employeeService->dropdown();
+        return view('orders.create', compact('employees'));
     }
 
     public function store(StoreOrderRequest $request)
@@ -35,10 +35,10 @@ class OrderController extends Controller
         return redirect()->route('orders.index')->with('success', 'Order created.');
     }
 
-    public function edit(Order $order, ModeratorService $moderatorService)
+    public function edit(Order $order, EmployeeService $employeeService)
     {
-        $moderators = $moderatorService->dropdown();
-        return view('orders.edit', compact('order', 'moderators'));
+        $employees = $employeeService->dropdown();
+        return view('orders.edit', compact('order', 'employees'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)

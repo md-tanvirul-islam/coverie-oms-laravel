@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Moderator;
+namespace App\Http\Requests\Employee;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateModeratorRequest extends FormRequest
+class UpdateEmployeeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +26,7 @@ class UpdateModeratorRequest extends FormRequest
             'phone'        => 'nullable|string|max:50',
             'joining_date' => 'nullable|date',
             'address'      => 'nullable|string|max:255',
-            'code'         => 'required|string|max:50|unique:moderators,code,' . $this->moderator->id,
+            'code'         => 'required|string|max:50|unique:employees,code,' . $this->employee->id,
             'commission_fee_per_order'  => 'nullable|string',
         ];
     }

@@ -1,10 +1,10 @@
 @extends('layouts.app')
 
 @section('content')
-<h4 class="mb-3">Add Moderator</h4>
+<h4 class="mb-3">Add Employee</h4>
 
 <div class="card shadow-sm p-4">
-    <form method="POST" action="{{ route('moderators.store') }}">
+    <form method="POST" action="{{ route('employees.store') }}">
         @csrf
 
         {{-- Name --}}
@@ -65,7 +65,7 @@
         </div>
 
         <button class="btn btn-primary">Create</button>
-        <a href="{{ route('moderators.index') }}" class="btn btn-secondary">Back</a>
+        <a href="{{ route('employees.index') }}" class="btn btn-secondary">Back</a>
     </form>
 </div>
 @endsection

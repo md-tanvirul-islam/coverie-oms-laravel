@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('merchant_order_id')->nullable();
             $table->string('courier_name')->index();
             $table->string('consignment_id')->index();
-    
+
             $table->dateTime('created_date')->nullable();
 
             $table->string('invoice_type')->nullable();
@@ -39,11 +39,14 @@ return new class extends Migration
             $table->decimal('promo_discount', 10, 2)->default(0);
             $table->decimal('payout', 10, 2)->default(0);
 
+            $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
-            
+
             $table->unique(
-                ['courier_name', 'consignment_id', 'order_id'], 
+                ['courier_name', 'consignment_id', 'order_id'],
                 'cpi_courier_consignment_order_unique'
             );
         });

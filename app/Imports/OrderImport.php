@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Models\Moderator;
+use App\Models\Employee;
 use App\Models\Order;
 use App\Models\Store;
 use Illuminate\Support\Carbon;
@@ -52,10 +52,10 @@ class OrderImport implements
         }
 
         $store = Store::where('name', $row['store'])->first(['id']);
-        $moderator = Moderator::where('code', $row['order_taken_by'])->first(['id']);
+        $employee = Employee::where('code', $row['order_taken_by'])->first(['id']);
 
         return new Order([
-            'moderator_id'     => $store?->id,
+            'employee_id'     => $store?->id,
             'invoice_id'       => (string) $row['invoice_id'],
             'order_date'       => $orderDate,
             'customer_name'    => $row['customer_name'],
@@ -64,7 +64,7 @@ class OrderImport implements
             'quantity'         => $row['quantity'],
             'total_cost'       => $row['total_cost'],
             'phone_model'      => $row['phone_model'],
-            'moderator_id'     => $moderator?->id,
+            'employee_id'     => $employee?->id,
         ]);
     }
 
@@ -95,7 +95,7 @@ class OrderImport implements
             '*.customer_address' => 'nullable|string',
             '*.total_cost'       => 'required|numeric|min:0',
             '*.phone_model'      => 'required|string|max:255',
-            '*.order_taken_by'   => 'required|exists:moderators,code',
+            '*.order_taken_by'   => 'required|exists:employees,code',
             '*.quantity'         => 'required|integer|min:1',
         ];
     }
@@ -105,7 +105,7 @@ class OrderImport implements
     {
         return [
             '*.invoice_id.unique' => 'Invoice ID already exists.',
-            '*.order_taken_by.exists' => 'Moderator code not found.',
+            '*.order_taken_by.exists' => 'Employee code not found.',
             '*.order_date.required' => 'Order date is required.',
         ];
     }

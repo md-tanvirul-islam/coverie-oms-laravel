@@ -8,7 +8,7 @@
         {{-- Page Header --}}
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                <h4 class="mb-0">Moderator Commission Report(Monthly)</h4>
+                <h4 class="mb-0">Employee Commission Report(Daily)</h4>
 
                 <a href="{{ route('courier_paid_invoices.index') }}" class="btn btn-light btn-sm">
                     <i class="bi bi-list"></i> Back to Invoice List
@@ -18,7 +18,7 @@
             <div class="card-body">
 
                 {{-- Filter Form --}}
-                <form method="GET" action="{{ route('reports.moderator_commission.monthly') }}" class="mb-4">
+                <form method="GET" action="{{ route('reports.employee_commission.daily') }}" class="mb-4">
                     <div class="row align-items-end">
 
                         <div class="col-md-3">
@@ -53,8 +53,8 @@
                     <table class="table table-bordered table-striped align-middle">
                         <thead class="table-dark">
                             <tr>
-                                <th>Month, Year</th>
-                                <th>Moderator Name</th>
+                                <th>Date</th>
+                                <th>Employee Name</th>
                                 <th>Code</th>
                                 <th>Total Quantity</th>
                                 <th>Commission (৳)</th>
@@ -64,9 +64,7 @@
                         <tbody>
                         @forelse ($reports as $report)
                             <tr>
-                                <td>
-                                    {{ \Carbon\Carbon::createFromFormat('!m', $report->order_month)->format('F') }}, {{ $report->order_year }}
-                                </td>
+                                <td>{{ $report->order_date }}</td>
                                 <td>{{ $report->name }}</td>
                                 <td>{{ $report->code }}</td>
                                 <td>{{ $report->total_quantity }}</td>

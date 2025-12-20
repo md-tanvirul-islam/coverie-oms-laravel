@@ -1,23 +1,23 @@
 <?php
 namespace App\DataTables;
 
-use App\Models\Moderator;
+use App\Models\Employee;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Column;
 use Yajra\DataTables\Html\Button;
 use Illuminate\Database\Eloquent\Builder;
 
-class ModeratorsDataTable extends DataTable
+class EmployeesDataTable extends DataTable
 {
     public function dataTable(Builder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('action', 'moderators.action')
+            ->addColumn('action', 'employees.action')
             ->setRowId('id');
     }
 
-    public function query(Moderator $model): Builder
+    public function query(Employee $model): Builder
     {
         return $model->newQuery();
     }
@@ -25,7 +25,7 @@ class ModeratorsDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-            ->setTableId('moderators-table')
+            ->setTableId('employees-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
@@ -60,6 +60,6 @@ class ModeratorsDataTable extends DataTable
 
     protected function filename(): string
     {
-        return 'Moderators_' . date('YmdHis');
+        return 'Employees_' . date('YmdHis');
     }
 }

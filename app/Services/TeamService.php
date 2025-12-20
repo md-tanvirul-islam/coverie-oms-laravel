@@ -100,12 +100,12 @@ class TeamService
 
             $ownerRole->syncPermissions(SystemPermission::newOwnerPermissions());
 
-            $moderatorRole = Role::updateOrCreate([
-                'name'    => SystemDefinedRole::MODERATOR,
+            $employeeRole = Role::updateOrCreate([
+                'name'    => SystemDefinedRole::EMPLOYEE,
                 'team_id' => $team->id,
             ]);
 
-            $moderatorRole->syncPermissions(SystemPermission::newModeratorPermissions());
+            $employeeRole->syncPermissions(SystemPermission::newEmployeePermissions());
 
             $user = User::updateOrCreate(
                 ['email' => $email],

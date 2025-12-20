@@ -58,9 +58,9 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{ route('moderators.index') }}"
-                                    class="nav-link {{ request()->routeIs('moderators.*') ? 'active' : '' }}">
-                                    Moderators
+                                <a href="{{ route('employees.index') }}"
+                                    class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
+                                    Employees
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -85,17 +85,17 @@
                                 </a>
 
                                 <ul class="dropdown-menu" aria-labelledby="reportsDropdown">
-                                    {{-- Moderator Commission Report --}}
+                                    {{-- Employee Commission Report --}}
                                     <li>
-                                        <a class="dropdown-item {{ request()->routeIs('reports.moderator_commission.daily') ? 'active' : '' }}"
-                                            href="{{ route('reports.moderator_commission.daily') }}">
-                                            Moderator Commission Report(Daily)
+                                        <a class="dropdown-item {{ request()->routeIs('reports.employee_commission.daily') ? 'active' : '' }}"
+                                            href="{{ route('reports.employee_commission.daily') }}">
+                                            Employee Commission Report(Daily)
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item {{ request()->routeIs('reports.moderator_commission.monthly') ? 'active' : '' }}"
-                                            href="{{ route('reports.moderator_commission.monthly') }}">
-                                            Moderator Commission Report(Monthly)
+                                        <a class="dropdown-item {{ request()->routeIs('reports.employee_commission.monthly') ? 'active' : '' }}"
+                                            href="{{ route('reports.employee_commission.monthly') }}">
+                                            Employee Commission Report(Monthly)
                                         </a>
                                     </li>
                                 </ul>

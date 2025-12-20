@@ -29,7 +29,7 @@ enum SystemPermission: string
     case COURIER_PAID_INVOICE_UPDATE = 'courier_paid_invoice.update';
     case COURIER_PAID_INVOICE_DELETE = 'courier_paid_invoice.delete';
 
-    case REPORT_MODERATOR_COMMISSION = 'report.moderator_commission';
+    case REPORT_EMPLOYEE_COMMISSION = 'report.employee_commission';
 
 
     /**
@@ -69,7 +69,7 @@ enum SystemPermission: string
             ->toArray();
     }
 
-    public static function newModeratorPermissions(): array
+    public static function newEmployeePermissions(): array
     {
         $permissions = [
             self::ORDER_READ,

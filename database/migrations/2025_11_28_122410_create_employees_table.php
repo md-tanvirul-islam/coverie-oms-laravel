@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('moderators', function (Blueprint $table) {
+        Schema::create('employees', function (Blueprint $table) {
             $table->id();
             $table->string('name');
             $table->string('phone')->nullable();
@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->string('code')->unique();
             $table->decimal('commission_fee_per_order', 10, 2)->default(0);
+            $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('updated_by')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('moderators');
+        Schema::dropIfExists('employees');
     }
 };
