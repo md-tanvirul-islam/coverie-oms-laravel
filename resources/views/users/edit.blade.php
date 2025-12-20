@@ -36,11 +36,11 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
-
+            @php $roles = $user->roles->count() ? $user->roles->pluck('id')->toArray() : [] @endphp
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
-                <x-dropdowns.select-role name="roles[]" multiple />
+                <x-dropdowns.select-role name="roles[]" :selected="$roles" multiple />
                 @error('roles')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
