@@ -10,11 +10,14 @@ class UserService
 {
     public function create(array $data)
     {
-        return User::create([
-            'name'     => $data['name'],
-            'email'    => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = new User();
+        $user->name = $data['name'];
+        $user->email = $data['email'];
+        $user->team_id = $data['team_id'];
+        $user->password = Hash::make($data['password']);
+        $user->save();
+
+        return $user;
     }
 
     public function update(User $user, array $data)
@@ -26,7 +29,9 @@ class UserService
             $user->password = Hash::make($data['password']);
         }
 
-        return $user->save();
+        $user->save();
+
+        return $user;
     }
 
     public function delete(User $user)

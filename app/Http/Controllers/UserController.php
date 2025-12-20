@@ -26,7 +26,15 @@ class UserController extends Controller
 
     public function store(StoreUserRequest $request)
     {
-        $this->service->create($request->validated());
+        $data = $request->validated();
+
+        $data['team_id'] = getPermissionsTeamId();
+
+        $user = $this->service->create($data);
+
+        $roles = Role::whereIn('id', $request->role_ids)->get();
+
+        $user->syncRoles($roles);
 
         return redirect()
             ->route('users.index')
