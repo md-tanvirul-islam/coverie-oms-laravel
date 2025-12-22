@@ -14,9 +14,9 @@
                         <i class="bi bi-download"></i> Export Excel
                     </a> --}}
 
-                    <a href="{{ route('users.create') }}" class="btn btn-primary">
+                    {{-- <a href="{{ route('users.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add User
-                    </a>
+                    </a> --}}
                 </div>
             </div>
             <div class="card-body  table-responsive">

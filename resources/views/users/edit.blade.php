@@ -36,12 +36,44 @@
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>
+
             @php $roles = $user->roles->count() ? $user->roles->pluck('id')->toArray() : [] @endphp
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
                 <x-dropdowns.select-role name="role_ids[]" :selected="$roles" multiple />
                 @error('roles')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            @php $stores = $user->stores->count() ? $user->stores->pluck('id')->toArray() : [] @endphp
+            {{-- Stores --}}
+            <div class="mb-3">
+                <label class="form-label">Stores </label>
+                <x-dropdowns.select-store name="store_ids[]" :selected="$stores" multiple />
+                @error('store_ids')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Full Data --}}
+            <div class="mb-3">
+                <label class="form-label">Data Visibility </label>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-yes" value="1" @checked(old('full_data', $user->full_data))> 
+                    <label class="form-check-label" for="data-visibility-yes">
+                        Full Data
+                    </label>
+                </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-no" value="0" @checked(old('full_data', $user->full_data))>
+                    <label class="form-check-label" for="data-visibility-no">
+                        Own Data
+                    </label>
+                </div>
+
+                @error('full_data')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

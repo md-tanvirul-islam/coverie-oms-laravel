@@ -40,7 +40,7 @@
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
-                <x-dropdowns.select-role name="role_ids[]" multiple />
+                <x-dropdowns.select-role name="role_ids[]" multiple :selected="old('role_ids', [])" />
                 @error('roles')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -49,7 +49,7 @@
             {{-- Stores --}}
             <div class="mb-3">
                 <label class="form-label">Stores </label>
-                <x-dropdowns.select-store name="store_ids[]" multiple />
+                <x-dropdowns.select-store name="store_ids[]" multiple :selected="old('store_ids', [])" />
                 @error('store_ids')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -59,20 +59,21 @@
             <div class="mb-3">
                 <label class="form-label">Data Visibility </label>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-yes" value="1">
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-yes" value="1"
+                        @checked(old('full_data'))>
                     <label class="form-check-label" for="data-visibility-yes">
                         Full Data
                     </label>
                 </div>
                 <div class="form-check">
-                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-no"
-                        value="0>
+                    <input class="form-check-input" type="radio" name="full_data" id="data-visibility-no" value="0"
+                        @checked(old('full_data'))>
                     <label class="form-check-label" for="data-visibility-no">
-                    Own Data
+                        Own Data
                     </label>
                 </div>
 
-                @error('roles')
+                @error('full_data')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

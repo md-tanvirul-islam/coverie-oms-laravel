@@ -30,22 +30,13 @@ class UserController extends Controller
 
         $data['team_id'] = getPermissionsTeamId();
 
-        $user = $this->service->create($data);
+        $user = $this->service->createUserAndAssignRoleTeamStore($data);
 
-        $roles = Role::whereIn('id', $data['role_ids'])->get();
-
-        $user->syncRoles($roles);
-
-        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
-            return [
-                $store_id => [
-                    'team_id'   => $data['team_id'],
-                    'full_data' => $data['full_data'] ?? null,
-                ],
-            ];
-        })->toArray();
-
-        $user->stores()->sync($storePivotData);
+        if (! $user) {
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'Failed! Try again later');
+        }
 
         return redirect()
             ->route('users.index')
@@ -61,24 +52,17 @@ class UserController extends Controller
     {
         $data = $request->validated();
 
-        $this->service->update($user, $data);
+        $user = $this->service->updateUserAndAssignRoleTeamStore($user, $data);
 
-        $roles = Role::whereIn('id', $data['role_ids'])->get();
+        $user->employee->update([
+            'name' => $data['name']
+        ]);
 
-        $user->syncRoles($roles);
-
-        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
-            return [
-                $store_id => [
-                    'team_id'   => $data['team_id'],
-                    'full_data' => $data['full_data'] ?? null,
-                ],
-            ];
-        })->toArray();
-
-        $user->stores()->sync($storePivotData);
-
-        $user->syncRoles($roles);
+        if (! $user) {
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'Failed! Try again later');
+        }
 
         return redirect()
             ->route('users.index')

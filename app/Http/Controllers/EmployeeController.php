@@ -7,10 +7,14 @@ use App\Http\Requests\Employee\StoreEmployeeRequest;
 use App\Http\Requests\Employee\UpdateEmployeeRequest;
 use App\Models\Employee;
 use App\Services\EmployeeService;
+use App\Services\UserService;
+use Exception;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
-    public function __construct(private EmployeeService $service) {}
+    public function __construct(private EmployeeService $service, private UserService $userService) {}
 
     public function index(EmployeesDataTable $dataTable)
     {
@@ -24,12 +28,31 @@ class EmployeeController extends Controller
 
     public function store(StoreEmployeeRequest $request)
     {
-        // dd($request->validated(), $request->all());
-        $this->service->create($request->validated());
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('employees.index')
-            ->with('success', 'Employee created successfully.');
+            $data = $request->validated();
+
+            $data['team_id'] = getPermissionsTeamId();
+
+            $user = $this->userService->createUserAndAssignRoleTeamStore($data);
+
+            if (! $user) {
+                throw new Exception("Failed to create user");
+            }
+
+            $this->service->create($data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('employees.index')
+                ->with('success', 'Employee created successfully.');
+        } catch (Exception | QueryException $ex) {
+            return redirect()
+                ->route('employees.index')
+                ->with('error', 'Failed! Try again later.');
+        }
     }
 
     public function edit(Employee $employee)
@@ -39,8 +62,6 @@ class EmployeeController extends Controller
 
     public function update(UpdateEmployeeRequest $request, Employee $employee)
     {
-        // dd($request->validated(), $request->all());
-
         $this->service->update($employee, $request->validated());
 
         return redirect()

@@ -11,6 +11,7 @@ class Store extends Model
     use SoftDeletes, HasArtifacts;
 
     protected $fillable = [
+        'team_id',
         'name',
         'type',
         'status',
@@ -35,6 +36,6 @@ class Store extends Model
 
     public function users()
     {
-        return $this->belongsToMany(Store::class, UserPermittedStore::class, 'user_id', 'store_id');
+        return $this->belongsToMany(User::class, UserPermittedStore::class, 'user_id', 'store_id');
     }
 }

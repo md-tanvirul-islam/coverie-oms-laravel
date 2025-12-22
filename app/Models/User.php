@@ -49,11 +49,18 @@ class User extends Authenticatable
         ];
     }
 
-    public function team(){
+    public function employee()
+    {
+        return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function team()
+    {
         return $this->belongsTo(Team::class);
     }
 
-    public function stores(){
+    public function stores()
+    {
         return $this->belongsToMany(Store::class, UserPermittedStore::class, 'user_id', 'store_id');
     }
 }

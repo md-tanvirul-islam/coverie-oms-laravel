@@ -6,7 +6,7 @@ enum SystemDefinedRole: string
 {
     case OWNER = 'OWNER';
     case ADMIN = 'ADMIN';
-    case EMPLOYEE = 'EMPLOYEE';
+    case MODERATOR = 'MODERATOR';
 
     /**
      * Return all values

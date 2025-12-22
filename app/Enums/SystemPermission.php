@@ -69,7 +69,7 @@ enum SystemPermission: string
             ->toArray();
     }
 
-    public static function newEmployeePermissions(): array
+    public static function newModeratorPermissions(): array
     {
         $permissions = [
             self::ORDER_READ,

@@ -10,8 +10,11 @@ use App\Http\Requests\Store\UpdateStoreRequest;
 use App\Imports\StoresImport;
 use App\Models\Store;
 use App\Services\StoreService;
+use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -33,13 +36,39 @@ class StoreController extends Controller
     {
         $data = $request->validated();
 
+        $data['team_id'] = getPermissionsTeamId();
+
         $data['created_by'] = Auth::id();
 
-        $this->service->create($data);
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('stores.index')
-            ->with('success', 'Store created.');
+            $store = $this->service->create($data);
+
+            $userPivotData = collect($data['user_ids'])->mapWithKeys(function ($user_id) use ($data) {
+                return [
+                    $user_id => [
+                        'team_id'   => $data['team_id'],
+                        'full_data' => $data['full_data'] ?? 0,
+                    ],
+                ];
+            })->toArray();
+
+            $store->users()->attach($userPivotData);
+
+            DB::commit();
+
+            return redirect()
+                ->route('stores.index')
+                ->with('success', 'Store created.');
+        } catch (Exception | QueryException $ex) {
+            DB::rollBack();
+            log_exception($ex, 'Failed to create store');
+
+            return redirect()
+                ->route('stores.index')
+                ->with('error', 'Failed! Try again later.');
+        }
     }
 
     public function edit(Store $store)
@@ -51,13 +80,38 @@ class StoreController extends Controller
     {
         $data = $request->validated();
 
+        $data['team_id'] = getPermissionsTeamId();
+
         $data['updated_by'] = Auth::id();
 
-        $this->service->update($store, $data);
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('stores.index')
-            ->with('success', 'Store updated.');
+            $this->service->update($store, $data);
+
+            $userPivotData = collect($data['user_ids'])->mapWithKeys(function ($user_id) use ($data) {
+                return [
+                    $user_id => [
+                        'team_id'   => $data['team_id'],
+                        'full_data' => $data['full_data'] ?? 0,
+                    ],
+                ];
+            })->toArray();
+
+            $store->users()->sync($userPivotData);
+
+            DB::commit();
+
+            return redirect()
+                ->route('stores.index')
+                ->with('success', 'Store updated.');
+        } catch (Exception | QueryException $ex) {
+            DB::rollBack();
+            log_exception($ex, 'Failed to update store');
+            return redirect()
+                ->route('stores.index')
+                ->with('error', 'Failed! Try again later.');
+        }
     }
 
     public function destroy(Store $store)
