@@ -45,16 +45,16 @@ class StoreController extends Controller
 
             $store = $this->service->create($data);
 
-            $userPivotData = collect($data['user_ids'])->mapWithKeys(function ($user_id) use ($data) {
+            $user_pivot_data = collect($data['user_ids'])->mapWithKeys(function ($user_id) use ($data) {
                 return [
                     $user_id => [
                         'team_id'   => $data['team_id'],
-                        'full_data' => $data['full_data'] ?? 0,
+                        'full_data' => $data['full_data_ar'][$user_id] ?? 0,
                     ],
                 ];
             })->toArray();
 
-            $store->users()->attach($userPivotData);
+            $store->users()->attach($user_pivot_data);
 
             DB::commit();
 
@@ -93,7 +93,7 @@ class StoreController extends Controller
                 return [
                     $user_id => [
                         'team_id'   => $data['team_id'],
-                        'full_data' => $data['full_data'] ?? 0,
+                        'full_data' => $data['full_data_ar'][$user_id] ?? 0,
                     ],
                 ];
             })->toArray();

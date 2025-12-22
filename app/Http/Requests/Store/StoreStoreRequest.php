@@ -28,7 +28,8 @@ class StoreStoreRequest extends FormRequest
                 $user = Auth::user();
                 $query->where('team_id', $user->team_id);
             })],
-            'full_data' => ['boolean', 'required']
+            'full_data_ar' => ['required', 'array'],
+            'full_data_ar.*' => ['boolean'],
         ];
     }
 }

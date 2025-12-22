@@ -8,10 +8,10 @@
                 <span>Manage Stores</span>
 
                 <div class="btn-group" role="group">
-                    <a href="{{ route('stores.import') }}" class="btn btn-primary"><i class="bi bi-upload"></i> Import
+                    {{-- <a href="{{ route('stores.import') }}" class="btn btn-primary"><i class="bi bi-upload"></i> Import
                         Excel</a>
                     <a href="{{ route('stores.export') }}" class="btn btn-success"><i class="bi bi-download"></i> Export
-                        Excel</a>
+                        Excel</a> --}}
 
                     <a href="{{ route('stores.create') }}" class="btn btn-primary">
                         <i class="bi bi-plus-circle"></i> Add Store

@@ -1,6 +1,6 @@
 @props(['name', 'options' => [], 'selected' => null])
 
-<select name="{{ $name }}" id="{{ $name }}"
+<select name="{{ $name }}"
     {{ $attributes->class(['form-select', 'is-invalid' => $errors->has($name), 'select2']) }}>
     @if (!$attributes->get('multiple'))
         <option>Select One</option>

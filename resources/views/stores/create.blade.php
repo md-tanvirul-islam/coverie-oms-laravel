@@ -3,8 +3,10 @@
 @section('content')
     <h4 class="mb-3">Add Store</h4>
 
-    <div class="card shadow-sm p-4" x-data="storeVisibility({{ json_encode(old('user_ids', [])) }})">
-
+    <div class="card shadow-sm p-4" x-data="storeVisibility(
+        @js(old('user_ids', [])),
+        @js(old('full_data_ar', []))
+    )" x-init="initSelect2()">
         <form method="POST" action="{{ route('stores.store') }}" enctype="multipart/form-data">
             @csrf
 
@@ -29,9 +31,7 @@
             {{-- Authorized Users --}}
             <div class="mb-3">
                 <label class="form-label">Authorized Users</label>
-
-                <x-dropdowns.select-user name="user_ids[]" multiple
-                    x-on:change="syncUsers($event.target.selectedOptions)" />
+                <x-dropdowns.select-user id="user-select" name="user_ids[]" :selected="old('user_ids', [])" multiple />
             </div>
 
             {{-- Per User Data Visibility --}}
@@ -48,14 +48,14 @@
 
                                 <div class="col-md-8">
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" :name="`full_data[${user.id}]`"
-                                            value="1" x-model="full_data[user.id]">
+                                        <input class="form-check-input" type="radio" :name="`full_data_ar[${user.id}]`"
+                                            value="1" x-model="full_data_ar[user.id]">
                                         <label class="form-check-label">Full Data</label>
                                     </div>
 
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" :name="`full_data[${user.id}]`"
-                                            value="0" x-model="full_data[user.id]">
+                                        <input class="form-check-input" type="radio" :name="`full_data_ar[${user.id}]`"
+                                            value="0" x-model="full_data_ar[user.id]">
                                         <label class="form-check-label">Own Data</label>
                                     </div>
                                 </div>
@@ -79,21 +79,44 @@
 
 @push('scripts')
     <script>
-        function storeVisibility(oldUsers = []) {
+        function storeVisibility(oldUsers = [], oldFullData = {}) {
             return {
                 users: [],
-                visibility: {},
+                full_data_ar: oldFullData ?? {},
 
-                syncUsers(options) {
-                    console.log(options);
-                    this.users = Array.from(options).map(opt => ({
-                        id: opt.value,
-                        name: opt.text
+                initSelect2() {
+                    const el = $('#user-select')
+
+                    el.select2()
+
+                    // restore old selections
+                    const initialData = el.select2('data')
+                    this.syncFromSelect2(initialData)
+
+                    el.on('select2:select select2:unselect', () => {
+                        this.syncFromSelect2(el.select2('data'))
+                    })
+                },
+
+                syncFromSelect2(data) {
+                    if (!data) return;
+
+                    this.users = data.map(u => ({
+                        id: u.id,
+                        name: u.text
                     }))
 
+                    // default visibility
                     this.users.forEach(user => {
-                        if (!this.visibility[user.id]) {
-                            this.visibility[user.id] = '0'
+                        if (this.full_data_ar[user.id] === undefined) {
+                            this.full_data_ar[user.id] = '0'
+                        }
+                    })
+
+                    // cleanup removed users
+                    Object.keys(this.full_data_ar).forEach(id => {
+                        if (!this.users.find(u => u.id == id)) {
+                            delete this.full_data_ar[id]
                         }
                     })
                 }
