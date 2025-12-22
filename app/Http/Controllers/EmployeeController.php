@@ -35,10 +35,14 @@ class EmployeeController extends Controller
 
             $data['team_id'] = getPermissionsTeamId();
 
-            $user = $this->userService->createUserAndAssignRoleTeamStore($data);
+            if (isset($data['email'], $data['password'])) {
+                $user = $this->userService->createUserAndAssignRoleTeamStore($data);
 
-            if (! $user) {
-                throw new Exception("Failed to create user");
+                if (! $user) {
+                    throw new Exception("Failed to create user");
+                }
+
+                $data['user_id'] = $user->id;
             }
 
             $this->service->create($data);
@@ -49,6 +53,8 @@ class EmployeeController extends Controller
                 ->route('employees.index')
                 ->with('success', 'Employee created successfully.');
         } catch (Exception | QueryException $ex) {
+            dd($ex);
+            log_exception($ex, 'Fail to create Employee.');
             return redirect()
                 ->route('employees.index')
                 ->with('error', 'Failed! Try again later.');

@@ -26,29 +26,33 @@ class StoreEmployeeRequest extends FormRequest
         $user = Auth::user();
 
         return [
-            'name'         => 'required|string|max:255',
-            'phone'        => 'nullable|string|max:50',
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:50',
             'joining_date' => 'nullable|date',
-            'address'      => 'nullable|string|max:255',
-            'code'         => 'required|string|max:50|unique:employees,code',
-            'commission_fee_per_order'  => 'nullable|string',
+            'address' => 'nullable|string|max:255',
+            'code' => 'required|string|max:50|unique:employees,code',
+            'commission_fee_per_order' => 'nullable|numeric|min:0',
+
             'has_login' => 'required|boolean',
-            'email' => 'required_if:has_login,1|email|unique:users,email',
-            'password' => 'required_if:has_login,1|min:6',
-            'role_ids' => 'required_if:has_login,1|array',
-            'store_ids' => 'required_if:has_login,1|array',
-            'role_ids.*'   => [
+
+            'email' => 'nullable|required_if:has_login,1|email|unique:users,email',
+            'password' => 'nullable|required_if:has_login,1|min:6',
+
+            'role_ids' => 'nullable|required_if:has_login,1|array',
+            'store_ids' => 'nullable|required_if:has_login,1|array',
+
+            'role_ids.*' => [
                 'integer',
-                Rule::exists('roles', 'id')->where(function ($query) use ($user) {
-                    $query->where('team_id', $user->team_id);
-                }),
+                Rule::exists('roles', 'id')->where(fn($q) => $q->where('team_id', $user->team_id)),
             ],
-            'store_ids.*'   => [
+
+            'store_ids.*' => [
                 'integer',
-                Rule::exists('stores', 'id')->where(function ($query) use ($user) {
-                    $query->where('team_id', $user->team_id);
-                }),
+                Rule::exists('stores', 'id')->where(fn($q) => $q->where('team_id', $user->team_id)),
             ],
+
+            'store_full_data' => 'nullable|required_if:has_login,1|array',
+            'store_full_data.*' => 'boolean',
         ];
     }
 }

@@ -57,12 +57,12 @@ class UserService
                 return [
                     $store_id => [
                         'team_id'   => $data['team_id'],
-                        'full_data' => $data['full_data'] ?? null,
+                        'full_data' => $data['store_full_data'][$store_id] ?? 0,
                     ],
                 ];
             })->toArray();
 
-            $user->stores()->sync($storePivotData);
+            $user->stores()->attach($storePivotData);
 
             return $user;
 
@@ -88,7 +88,7 @@ class UserService
                 return [
                     $store_id => [
                         'team_id'   => $data['team_id'],
-                        'full_data' => $data['full_data'] ?? null,
+                        'full_data' => $data['store_full_data'][$store_id] ?? 0,
                     ],
                 ];
             })->toArray();

@@ -1,73 +1,52 @@
 @extends('layouts.app')
 
 @section('content')
-    <div x-data="{ hasLogin: {{ old('has_login', 0) }} }" class="card shadow-sm p-4">
+    <div class="card shadow-sm p-4" x-data="employeeStoreVisibility(
+        @js(old('store_ids', [])),
+        @js(old('store_full_data', [])),
+        {{ old('has_login', 0) }}
+    )" x-init="initStoreSelect2()">
+
         <h4 class="mb-3">Add Employee</h4>
 
         <form method="POST" action="{{ route('employees.store') }}">
             @csrf
 
-            {{-- Name --}}
+            {{-- ================= BASIC INFO ================= --}}
+
             <div class="mb-3">
                 <label class="form-label">Name</label>
-                <input name="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror"
-                    required>
-                @error('name')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input name="name" value="{{ old('name') }}" class="form-control" required>
             </div>
 
-            {{-- Phone --}}
             <div class="mb-3">
                 <label class="form-label">Phone</label>
-                <input name="phone" value="{{ old('phone') }}" class="form-control @error('phone') is-invalid @enderror">
-                @error('phone')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input name="phone" value="{{ old('phone') }}" class="form-control">
             </div>
 
-            {{-- Joining Date --}}
             <div class="mb-3">
                 <label class="form-label">Joining Date</label>
-                <input type="date" name="joining_date" value="{{ old('joining_date') }}"
-                    class="form-control @error('joining_date') is-invalid @enderror">
-                @error('joining_date')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input type="date" name="joining_date" value="{{ old('joining_date') }}" class="form-control">
             </div>
 
-            {{-- Address --}}
             <div class="mb-3">
                 <label class="form-label">Address</label>
-                <input name="address" value="{{ old('address') }}"
-                    class="form-control @error('address') is-invalid @enderror">
-                @error('address')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <input name="address" value="{{ old('address') }}" class="form-control">
             </div>
 
-            {{-- Code --}}
             <div class="mb-3">
-                <label class="form-label">Code</label>
-                <input name="code" value="{{ old('code') }}" class="form-control @error('code') is-invalid @enderror"
-                    required>
-                @error('code')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                <label class="form-label">Employee Code</label>
+                <input name="code" value="{{ old('code') }}" class="form-control" required>
             </div>
 
-            {{-- Commission --}}
             <div class="mb-3">
                 <label class="form-label">Commission Fee Per Order</label>
                 <input type="number" min="0" name="commission_fee_per_order"
-                    value="{{ old('commission_fee_per_order') }}"
-                    class="form-control @error('commission_fee_per_order') is-invalid @enderror" required>
-                @error('commission_fee_per_order')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
+                    value="{{ old('commission_fee_per_order') }}" class="form-control" required>
             </div>
 
-            {{-- Login Access --}}
+            {{-- ================= LOGIN ACCESS ================= --}}
+
             <div class="mb-3">
                 <label class="form-label">User Login Access</label>
 
@@ -82,73 +61,124 @@
                         x-model.number="hasLogin">
                     <label class="form-check-label">No</label>
                 </div>
-
-                @error('has_login')
-                    <div class="invalid-feedback d-block">{{ $message }}</div>
-                @enderror
             </div>
 
-            {{-- Login Credentials --}}
+            {{-- ================= LOGIN DETAILS ================= --}}
+
             <div x-show="hasLogin === 1" x-transition x-cloak class="card shadow-sm p-3 mb-3">
 
                 <h5 class="mb-3">Login Credentials</h5>
 
-                {{-- Email --}}
                 <div class="mb-3">
                     <label class="form-label">Email</label>
-                    <input name="email" type="email" value="{{ old('email') }}" :disabled="hasLogin !== 1"
-                        class="form-control @error('email') is-invalid @enderror">
-                    @error('email')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input name="email" type="email" value="{{ old('email') }}" class="form-control">
                 </div>
 
-                {{-- Password --}}
                 <div class="mb-3">
                     <label class="form-label">Password</label>
-                    <input name="password" type="password" :disabled="hasLogin !== 1"
-                        class="form-control @error('password') is-invalid @enderror">
-                    @error('password')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                    <input name="password" type="password" class="form-control">
                 </div>
 
-                {{-- Roles --}}
                 <div class="mb-3">
                     <label class="form-label">Roles</label>
                     <x-dropdowns.select-role name="role_ids[]" multiple />
-                    @error('role_ids')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
                 </div>
 
-                {{-- Stores --}}
+                {{-- ================= STORES ================= --}}
+
                 <div class="mb-3">
-                    <label class="form-label">Stores</label>
-                    <x-dropdowns.select-store name="store_ids[]" multiple />
-                    @error('store_ids')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
+                    <label class="form-label">Assigned Stores</label>
+                    <x-dropdowns.select-store id="store-select" name="store_ids[]" :selected="old('store_ids', [])" multiple />
                 </div>
 
-                {{-- Data Visibility --}}
-                <div class="mb-3">
-                    <label class="form-label">Data Visibility</label>
+                {{-- ================= PER STORE VISIBILITY ================= --}}
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="full_data" value="1" checked>
-                        <label class="form-check-label">Full Data</label>
-                    </div>
+                <template x-if="stores.length">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">
+                            Store-wise Data Visibility
+                        </label>
 
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="full_data" value="0">
-                        <label class="form-check-label">Own Data</label>
+                        <div class="border rounded p-3 mt-2">
+                            <template x-for="store in stores" :key="store.id">
+                                <div class="row align-items-center mb-2">
+                                    <div class="col-md-5">
+                                        <strong x-text="store.name"></strong>
+                                    </div>
+
+                                    <div class="col-md-7">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio"
+                                                :name="`store_full_data[${store.id}]`" value="1"
+                                                x-model="store_full_data[store.id]">
+                                            <label class="form-check-label">Full Data</label>
+                                        </div>
+
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio"
+                                                :name="`store_full_data[${store.id}]`" value="0"
+                                                x-model="store_full_data[store.id]">
+                                            <label class="form-check-label">Own Data</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                </div>
+                </template>
+
             </div>
+
+            {{-- ================= ACTIONS ================= --}}
 
             <button class="btn btn-primary">Create</button>
             <a href="{{ route('employees.index') }}" class="btn btn-secondary">Back</a>
+
         </form>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function employeeStoreVisibility(oldStores = [], oldVisibility = {}, hasLogin = 0) {
+            return {
+                hasLogin: hasLogin,
+                stores: [],
+                store_full_data: oldVisibility ?? {},
+
+                initStoreSelect2() {
+                    const el = $('#store-select')
+                    el.select2()
+
+                    // Initial load (old data)
+                    this.syncFromSelect2(el.select2('data'))
+
+                    el.on('select2:select select2:unselect', () => {
+                        this.syncFromSelect2(el.select2('data'))
+                    })
+                },
+
+                syncFromSelect2(data) {
+                    this.stores = data.map(s => ({
+                        id: s.id,
+                        name: s.text
+                    }))
+
+                    // Default visibility
+                    this.stores.forEach(store => {
+                        if (this.store_full_data[store.id] === undefined) {
+                            this.store_full_data[store.id] = '0'
+                        }
+                    })
+
+                    // Cleanup removed stores
+                    Object.keys(this.store_full_data).forEach(id => {
+                        if (!this.stores.find(s => s.id == id)) {
+                            delete this.store_full_data[id]
+                        }
+                    })
+                }
+            }
+        }
+    </script>
+@endpush

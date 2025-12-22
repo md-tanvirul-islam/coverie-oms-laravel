@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 class Employee extends Model
 {
     protected $fillable = [
+        'user_id',
+        'team_id',
         'name',
         'phone',
         'joining_date',
@@ -25,5 +27,9 @@ class Employee extends Model
         return Attribute::get(function () {
             return "{$this->name} ({$this->code})";
         });
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
     }
 }

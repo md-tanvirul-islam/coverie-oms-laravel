@@ -22,7 +22,7 @@ class UpdateEmployeeRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {        
+    {
         $user = Auth::user();
 
         return [
@@ -33,10 +33,11 @@ class UpdateEmployeeRequest extends FormRequest
             'code'         => 'required|string|max:50|unique:employees,code,' . $this->employee->id,
             'commission_fee_per_order'  => 'nullable|string',
             'has_login' => 'required|boolean',
-            'email' => 'required_if:has_login,1|email|unique:users,email' . $this->employee->user_id,
-            'password' => 'required_if:has_login,1|min:6',
-            'role_ids' => 'required_if:has_login,1|array',
-            'store_ids' => 'required_if:has_login,1|array',
+            'email' => 'nullable|required_if:has_login,1|email|unique:users,email',
+            'password' => 'nullable|required_if:has_login,1|min:6',
+
+            'role_ids' => 'nullable|required_if:has_login,1|array',
+            'store_ids' => 'nullable|required_if:has_login,1|array',
             'role_ids.*'   => [
                 'integer',
                 Rule::exists('roles', 'id')->where(function ($query) use ($user) {
@@ -49,6 +50,9 @@ class UpdateEmployeeRequest extends FormRequest
                     $query->where('team_id', $user->team_id);
                 }),
             ],
+            
+            'store_full_data' => 'nullable|required_if:has_login,1|array',
+            'store_full_data.*' => 'boolean',
         ];
     }
 }

@@ -13,6 +13,7 @@ class EmployeesDataTable extends DataTable
     public function dataTable(Builder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('login_access', fn($row) => $row->user_id ? 'Yes' : 'No')
             ->addColumn('action', 'employees.action')
             ->setRowId('id');
     }
@@ -50,6 +51,7 @@ class EmployeesDataTable extends DataTable
             Column::make('address'),
             Column::make('code'),
             Column::make('commission_fee_per_order'),
+            Column::make('login_access'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
