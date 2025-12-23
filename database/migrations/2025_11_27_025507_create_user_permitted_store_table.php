@@ -17,7 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('store_id');
             $table->boolean('full_data');
-            $table->timestamps();
+
+            $table->softDeletes();
         });
     }
 

@@ -13,37 +13,30 @@ return new class extends Migration
     {
         Schema::create('courier_paid_invoices', function (Blueprint $table) {
             $table->id();
-
+            $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('order_id')->nullable()->index();
-
             $table->string('merchant_order_id')->nullable();
             $table->string('courier_name')->index();
             $table->string('consignment_id')->index();
-
             $table->dateTime('created_date')->nullable();
-
             $table->string('invoice_type')->nullable();
-
             $table->decimal('collected_amount', 10, 2)->default(0);
             $table->string('recipient_name')->nullable();
             $table->string('recipient_phone')->nullable();
-
             $table->decimal('collectable_amount', 10, 2)->default(0);
             $table->decimal('cod_fee', 10, 2)->default(0);
             $table->decimal('delivery_fee', 10, 2)->default(0);
             $table->decimal('final_fee', 10, 2)->default(0);
-
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('additional_charge', 10, 2)->default(0);
             $table->decimal('compensation_cost', 10, 2)->default(0);
             $table->decimal('promo_discount', 10, 2)->default(0);
             $table->decimal('payout', 10, 2)->default(0);
 
-            $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
-            $table->timestamps();
             $table->softDeletes();
+            $table->timestamps();
 
             $table->unique(
                 ['courier_name', 'consignment_id', 'order_id'],

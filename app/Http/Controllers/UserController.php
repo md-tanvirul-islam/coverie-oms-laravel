@@ -8,6 +8,8 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\Role;
 use App\Models\User;
 use App\Services\UserService;
+use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -30,17 +32,19 @@ class UserController extends Controller
 
         $data['team_id'] = getPermissionsTeamId();
 
-        $user = $this->service->createUserAndAssignRoleTeamStore($data);
+        try {
+            $this->service->createUserAndAssignRoleTeamStore($data);
 
-        if (! $user) {
+            return redirect()
+                ->route('users.index')
+                ->with('success', 'User created successfully.');
+        } catch (Exception | QueryException $ex) {
+            log_exception($ex, "User creation failed");
+
             return redirect()
                 ->route('users.index')
                 ->with('error', 'Failed! Try again later');
         }
-
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User created successfully.');
     }
 
     public function edit(User $user)
@@ -51,22 +55,23 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, User $user)
     {
         $data = $request->validated();
+        try {
+            $user = $this->service->updateUserAndAssignRoleTeamStore($user, $data);
 
-        $user = $this->service->updateUserAndAssignRoleTeamStore($user, $data);
+            $user->employee->update([
+                'name' => $data['name']
+            ]);
 
-        $user->employee->update([
-            'name' => $data['name']
-        ]);
-
-        if (! $user) {
             return redirect()
                 ->route('users.index')
-                ->with('error', 'Failed! Try again later');
-        }
+                ->with('success', 'User update successfully.');
+        } catch (Exception | QueryException $ex) {
+            log_exception($ex, "User update failed");
 
-        return redirect()
-            ->route('users.index')
-            ->with('success', 'User updated.');
+            return redirect()
+                ->route('users.index')
+                ->with('error', 'Failed! Try again later.');
+        }
     }
 
     public function destroy(User $user)

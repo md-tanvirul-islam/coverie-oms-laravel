@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Employee;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeService
 {
@@ -18,8 +19,21 @@ class EmployeeService
 
     public function delete(Employee $employee)
     {
-        return $employee->delete();
+        DB::transaction(function () use ($employee) {
+
+            $user = $employee->user;
+
+            if ($user) {
+                $user->stores()->detach();
+                $user->syncRoles([]);
+                $user->delete();
+            }
+            $employee->delete();
+        });
+
+        return true;
     }
+
 
     public function dropdown()
     {

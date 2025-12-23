@@ -22,6 +22,7 @@ return new class extends Migration
             $table->text('customer_address')->nullable();
             $table->decimal('total_cost', 10, 2);
             $table->unsignedBigInteger('team_id');
+           
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->softDeletes();

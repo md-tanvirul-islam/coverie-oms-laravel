@@ -14,6 +14,7 @@
         "laravel/tinker": "^2.10.1",
         "laraveljutsu/laravel-artifact": "^1.0",
         "maatwebsite/excel": "4.x-dev",
+        "opcodesio/log-viewer": "^3.21",
         "spatie/laravel-permission": "^6.24",
         "yajra/laravel-datatables": "^12.0"
     },

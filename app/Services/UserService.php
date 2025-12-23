@@ -45,65 +45,46 @@ class UserService
 
     public function createUserAndAssignRoleTeamStore(array $data)
     {
-        try {
-            DB::beginTransaction();
-            $user = $this->create($data);
+        $user = $this->create($data);
 
-            $roles = Role::whereIn('id', $data['role_ids'])->get();
+        $roles = Role::whereIn('id', $data['role_ids'])->get();
 
-            $user->syncRoles($roles);
+        $user->syncRoles($roles);
 
-            $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
-                return [
-                    $store_id => [
-                        'team_id'   => $data['team_id'],
-                        'full_data' => $data['store_full_data'][$store_id] ?? 0,
-                    ],
-                ];
-            })->toArray();
+        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
+            return [
+                $store_id => [
+                    'team_id'   => $data['team_id'],
+                    'full_data' => $data['store_full_data'][$store_id] ?? 0,
+                ],
+            ];
+        })->toArray();
 
-            $user->stores()->attach($storePivotData);
+        $user->stores()->attach($storePivotData);
 
-            return $user;
-
-            DB::commit();
-        } catch (Exception | QueryException $ex) {
-            log_exception($ex, "User creation and assign role, team, store");
-            return null;
-        }
+        return $user;
     }
 
     public function updateUserAndAssignRoleTeamStore(User $user, array $data)
     {
-        try {
-            DB::beginTransaction();
+        $this->update($user, $data);
 
-            $this->update($user, $data);
+        $roles = Role::whereIn('id', $data['role_ids'])->get();
 
-            $roles = Role::whereIn('id', $data['role_ids'])->get();
+        $user->syncRoles($roles);
 
-            $user->syncRoles($roles);
+        $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
+            return [
+                $store_id => [
+                    'team_id'   => $data['team_id'],
+                    'full_data' => $data['store_full_data'][$store_id] ?? 0,
+                ],
+            ];
+        })->toArray();
 
-            $storePivotData = collect($data['store_ids'])->mapWithKeys(function ($store_id) use ($data) {
-                return [
-                    $store_id => [
-                        'team_id'   => $data['team_id'],
-                        'full_data' => $data['store_full_data'][$store_id] ?? 0,
-                    ],
-                ];
-            })->toArray();
+        $user->stores()->sync($storePivotData);
 
-            $user->stores()->sync($storePivotData);
-
-            $user->syncRoles($roles);
-
-            return $user;
-
-            DB::commit();
-        } catch (Exception | QueryException $ex) {
-            log_exception($ex, "User creation and assign role, team, store");
-            return null;
-        }
+        return $user;
     }
 
     public function dropdown()
