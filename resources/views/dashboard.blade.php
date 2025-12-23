@@ -13,11 +13,16 @@
 
         @role(\App\Enums\SystemDefinedRole::ADMIN)
         @else
-            {{-- Statics Card --}}
-            <livewire:statistic-cards />
+            @canany([\App\Enums\SystemPermission::ORDER_READ->value,
+                \App\Enums\SystemPermission::COURIER_PAID_INVOICE_READ->value])
+                {{-- Statics Card --}}
+                <livewire:statistic-cards />
+            @endcan
 
-            {{-- Collected Amount Bar Char --}}
-            <livewire:collected-amount-bar-chart />
+            @can(\App\Enums\SystemPermission::COURIER_PAID_INVOICE_READ->value)
+                {{-- Collected Amount Bar Char --}}
+                <livewire:collected-amount-bar-chart />
+            @endcan
         @endrole
 
     </div>

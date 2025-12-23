@@ -14,6 +14,11 @@ enum SystemPermission: string
     case ROLE_UPDATE = 'role.update';
     case ROLE_DELETE = 'role.delete';
 
+    case EMPLOYEE_CREATE = 'employee.create';
+    case EMPLOYEE_READ   = 'employee.read';
+    case EMPLOYEE_UPDATE = 'employee.update';
+    case EMPLOYEE_DELETE = 'employee.delete';
+
     case STORE_CREATE = 'store.create';
     case STORE_READ   = 'store.read';
     case STORE_UPDATE = 'store.update';

@@ -62,7 +62,7 @@
                         @endcan
 
                         {{-- Employees --}}
-                        @can(\App\Enums\SystemPermission::USER_READ->value)
+                        @can(\App\Enums\SystemPermission::EMPLOYEE_READ->value)
                             <li class="nav-item">
                                 <a href="{{ route('employees.index') }}"
                                     class="nav-link {{ request()->routeIs('employees.*') ? 'active' : '' }}">
