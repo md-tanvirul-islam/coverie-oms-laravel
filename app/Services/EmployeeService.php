@@ -24,8 +24,6 @@ class EmployeeService
             $user = $employee->user;
 
             if ($user) {
-                $user->stores()->detach();
-                $user->syncRoles([]);
                 $user->delete();
             }
             $employee->delete();
