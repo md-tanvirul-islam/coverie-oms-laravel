@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use LaravelJutsu\Artifact\Concerns\HasArtifacts;
 
 class Store extends Model
 {
-    use SoftDeletes, HasArtifacts;
+    use SoftDeletes, HasArtifacts, HasTeamScope;
 
     protected $fillable = [
         'team_id',

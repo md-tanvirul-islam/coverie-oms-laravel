@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CourierPaidInvoice extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasTeamScope;
     
     protected $fillable = [
         'courier_name',
