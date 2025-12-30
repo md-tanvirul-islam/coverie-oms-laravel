@@ -14,6 +14,9 @@ class ExpensesDataTable extends DataTable
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
+            ->addColumn('expense_type', fn ($expense) => $expense->expenseType?->name)
+            ->addColumn('store', fn ($expense) => $expense->store?->name)
+            ->addColumn('employee', fn ($expense) => $expense->employee?->name)
             ->addColumn('action', 'expenses.action')
             ->setRowId('id');
     }
@@ -46,9 +49,9 @@ class ExpensesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('expense_type_id'),
-            Column::make('store_id'),
-            Column::make('employee_id'),
+            Column::make('expense_type'),
+            Column::make('store'),
+            Column::make('employee'),
             Column::make('amount'),
             Column::make('expense_date'),
             Column::make('reference'),

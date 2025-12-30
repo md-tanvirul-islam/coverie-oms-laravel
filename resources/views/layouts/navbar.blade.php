@@ -91,15 +91,40 @@
                             </li>
                         @endcan
 
-                        {{-- Expense Types --}}
-                        @can(\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value)
-                            <li class="nav-item">
-                                <a href="{{ route('expense_types.index') }}"
-                                    class="nav-link {{ request()->routeIs('expense_types.*') ? 'active' : '' }}">
-                                    Expense Types
+                        {{-- REPORTS --}}
+                        @canany([\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value,
+                            \App\Enums\SystemPermission::EXPENSE_READ->value])
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {{ request()->routeIs('expense.*') ? 'active' : '' }}"
+                                    href="#" data-bs-toggle="dropdown">
+                                    Expenses
                                 </a>
+
+                                <ul class="dropdown-menu">
+                                    {{-- Expense Types --}}
+                                    @can(\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value)
+                                        <li>
+                                            <a href="{{ route('expense_types.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('expense_types.*') ? 'active' : '' }}">
+                                                Expense Types
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    {{-- Expense --}}
+                                    @can(\App\Enums\SystemPermission::EXPENSE_READ->value)
+                                        <li>
+                                            <a href="{{ route('expenses.index') }}"
+                                                class="dropdown-item  {{ request()->routeIs('expenses.*') ? 'active' : '' }}">
+                                                Expenses
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
+
                             </li>
-                        @endcan
+                        @endcanany
+
 
                         {{-- Income Types --}}
                         @can(\App\Enums\SystemPermission::INCOME_TYPE_READ->value)

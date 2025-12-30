@@ -65,4 +65,9 @@ class ExpenseTypeService
     {
         return ExpenseType::findOrFail($id);
     }
+
+    public function dropdown()
+    {
+        return ExpenseType::pluck('name', 'id')->toArray();
+    }
 }
