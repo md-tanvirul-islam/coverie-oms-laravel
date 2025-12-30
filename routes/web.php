@@ -3,6 +3,8 @@
 use App\Http\Controllers\CourierPaidInvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\ExpressTypeController;
+use App\Http\Controllers\IncomeTypeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
@@ -54,6 +56,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('reports/employee_commission/monthly', [ReportController::class, 'employeeCommissionMonthlyReport'])
         ->name('reports.employee_commission.monthly');
+
+    Route::resource('express_types', ExpressTypeController::class);
+    Route::resource('income_types', IncomeTypeController::class);
+
 
     //super-admin
     Route::get('teams/import', [TeamController::class, 'import'])->name('teams.import');

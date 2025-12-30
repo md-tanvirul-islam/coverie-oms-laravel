@@ -91,6 +91,26 @@
                             </li>
                         @endcan
 
+                        {{-- Express Types --}}
+                        @can(\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value)
+                            <li class="nav-item">
+                                <a href="{{ route('express_types.index') }}"
+                                    class="nav-link {{ request()->routeIs('express_types.*') ? 'active' : '' }}">
+                                    Express Types
+                                </a>
+                            </li>
+                        @endcan
+
+                        {{-- Income Types --}}
+                        @can(\App\Enums\SystemPermission::INCOME_TYPE_READ->value)
+                            <li class="nav-item">
+                                <a href="{{ route('income_types.index') }}"
+                                    class="nav-link {{ request()->routeIs('income_types.*') ? 'active' : '' }}">
+                                    Income Types
+                                </a>
+                            </li>
+                        @endcan
+
                         {{-- REPORTS --}}
                         @canany([\App\Enums\SystemPermission::REPORT_EMPLOYEE_COMMISSION->value,
                             \App\Enums\SystemPermission::REPORT_EXPENSE->value, \App\Enums\SystemPermission::REPORT_INCOME->value])
@@ -111,7 +131,7 @@
                                         </li>
                                     @endcan
 
-                                    @can(\App\Enums\SystemPermission::REPORT_EXPENSE->value)
+                                    {{-- @can(\App\Enums\SystemPermission::REPORT_EXPENSE->value)
                                         <li>
                                             <a class="dropdown-item" href="{{ route('reports.expense') }}">
                                                 Expense Report
@@ -125,7 +145,7 @@
                                                 Income Report
                                             </a>
                                         </li>
-                                    @endcan
+                                    @endcan --}}
 
                                 </ul>
                             </li>

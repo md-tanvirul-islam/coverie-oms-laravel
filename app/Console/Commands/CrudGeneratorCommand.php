@@ -15,7 +15,7 @@ class CrudGeneratorCommand extends Command
     {
         $file_name = $this->argument('file_name');
 
-        $jsonPath = base_path("crud/{$file_name}");
+        $jsonPath = base_path("crud/ref/{$file_name}");
 
         if (!File::exists($jsonPath)) {
             $this->error("JSON file not found at {$jsonPath}");
@@ -121,7 +121,7 @@ class CrudGeneratorCommand extends Command
         }
 
         // Load stub
-        $stub = File::get(base_path('stubs/model.stub'));
+        $stub = File::get(base_path('crud/stubs/model.stub'));
 
         // Replace placeholders
         $stub = str_replace(
@@ -201,7 +201,7 @@ class CrudGeneratorCommand extends Command
         // }
 
         // Load stub and replace placeholders
-        $stub = File::get(base_path('stubs/migration.stub'));
+        $stub = File::get(base_path('crud/stubs/migration.stub'));
         $stub = str_replace(
             ['{{ table }}', '{{ fields }}', '{{ relations }}'],
             [$table, $fieldsCode, $relationsCode],
@@ -237,7 +237,7 @@ class CrudGeneratorCommand extends Command
         }
         $filters = rtrim($filters, "\n"); // remove trailing newline
 
-        $stub = File::get(base_path('stubs/service.stub'));
+        $stub = File::get(base_path('crud/stubs/service.stub'));
         $stub = str_replace(
             ['{{ model }}',  '{{ table }}', '{{ filters }}'],
             [$model_name, $table_name, $filters],
@@ -252,6 +252,7 @@ class CrudGeneratorCommand extends Command
     {
         $model_name = $config['model'];
         $route_prefix = $config['route_prefix'];
+        $route_prefix_singular = Str::singular($config['route_prefix']);
 
         $storeDir = app_path("Http/Requests/{$model_name}");
         $storePath = "{$storeDir}/Store{$model_name}Request.php";
@@ -267,7 +268,7 @@ class CrudGeneratorCommand extends Command
         }
 
         // Replace placeholders in StoreRequest
-        $storeStub = File::get(base_path('stubs/request.store.stub'));
+        $storeStub = File::get(base_path('crud/stubs/request.store.stub'));
         $storeStub = str_replace(
             ['{{ model }}', '{{ rules }}'],
             [$model_name, rtrim($rulesCode)],
@@ -282,10 +283,10 @@ class CrudGeneratorCommand extends Command
         foreach ($config['fields'] as $field => $props) {
             $rules = explode('|', $props['validation'] ?? '');
             $has_unique = false;
-            $rules = array_map(function ($r) use ($route_prefix, &$has_unique) {
+            $rules = array_map(function ($r) use ($route_prefix_singular, &$has_unique) {
                 if (str_contains($r, 'unique')) {
                     $has_unique = true;
-                    return $r . ",'. \$this->{$route_prefix}->id";
+                    return $r . ",'. \$this->{$route_prefix_singular}->id";
                 }
 
                 return $r;
@@ -301,7 +302,7 @@ class CrudGeneratorCommand extends Command
         }
 
         // Replace placeholders in UpdateRequest
-        $updateStub = File::get(base_path('stubs/request.update.stub'));
+        $updateStub = File::get(base_path('crud/stubs/request.update.stub'));
         $updateStub = str_replace(
             ['{{ model }}', '{{ rules }}'],
             [$model_name, rtrim($rulesCode)],
@@ -316,7 +317,9 @@ class CrudGeneratorCommand extends Command
         foreach ($config['fields'] as $field => $props) {
             $rules = explode('|', $props['validation'] ?? '');
 
-            $rules = array_filter($rules, function ($r) { return in_array($r, ['string', 'integer', 'boolean']); });
+            $rules = array_filter($rules, function ($r) {
+                return in_array($r, ['string', 'integer', 'boolean']);
+            });
 
             $rules[] = 'nullable';
 
@@ -326,7 +329,7 @@ class CrudGeneratorCommand extends Command
         }
 
         // Replace placeholders in StoreRequest
-        $filterStub = File::get(base_path('stubs/request.filter.stub'));
+        $filterStub = File::get(base_path('crud/stubs/request.filter.stub'));
         $filterStub = str_replace(
             ['{{ model }}', '{{ rules }}'],
             [$model_name, rtrim($rulesCode)],
@@ -345,7 +348,7 @@ class CrudGeneratorCommand extends Command
         $route_prefix = $config['route_prefix'];
 
         $controllerPath = app_path("Http/Controllers/{$model_name}Controller.php");
-        $stub = File::get(base_path("stubs/controller.stub"));
+        $stub = File::get(base_path("crud/stubs/controller.stub"));
 
         $createdBy = isset($config['fields']['created_by'])
             ? "\$data['created_by'] = Auth::id();"
@@ -390,7 +393,7 @@ class CrudGeneratorCommand extends Command
         $model_plural = Str::plural($model_name);
 
         $dataTablePath = app_path("DataTables/{$model_plural}DataTable.php");
-        $stub = File::get(base_path('stubs/datatable.stub'));
+        $stub = File::get(base_path('crud/stubs/datatable.stub'));
 
         // Generate dynamic columns from JSON fields
         $columnsCode = '';
@@ -418,7 +421,7 @@ class CrudGeneratorCommand extends Command
         $model_plural = Str::plural($model_name);
 
         $exportPath = app_path("Exports/{$model_plural}Export.php");
-        $stub = File::get(base_path('stubs/export.stub'));
+        $stub = File::get(base_path('crud/stubs/export.stub'));
 
         $fieldsList = implode(",\n            ", array_map(fn($f) => "'{$f}'", array_keys($config['fields'])));
         $headingsList = implode(",\n            ", array_map(fn($f) => "'" . strtolower($f) . "'", array_keys($config['fields'])));
@@ -439,7 +442,7 @@ class CrudGeneratorCommand extends Command
         $model_plural = Str::plural($model_name);
 
         $importPath = app_path("Imports/{$model_plural}Import.php");
-        $stub = File::get(base_path('stubs/import.stub'));
+        $stub = File::get(base_path('crud/stubs/import.stub'));
 
         $fieldsMapping = implode(",\n            ", array_map(fn($f) => "'{$f}' => \$row['" . strtolower($f) . "']", array_keys($config['fields'])));
         $validationRules = implode(",\n            ", array_map(fn($f, $props) => "'" . strtolower($f) . "' => '{$props['validation']}'", array_keys($config['fields']), $config['fields']));
@@ -501,9 +504,14 @@ class CrudGeneratorCommand extends Command
         $viewsDir = resource_path("views/{$route_prefix}");
         File::ensureDirectoryExists($viewsDir);
 
-        $stubs = ['index', 'create', 'edit', 'action', 'import'];
+        $stubs = ['index', 'create', 'edit', 'action'];
+
+        if (!empty($config['excel_import'])) {
+            $stubs[] = 'import';
+        }
+
         foreach ($stubs as $stubName) {
-            $stubPath = base_path("stubs/views/{$stubName}.stub");
+            $stubPath = base_path("crud/stubs/views/{$stubName}.stub");
             $filePath = "{$viewsDir}/{$stubName}.blade.php";
 
             $stubContent = File::get($stubPath);
