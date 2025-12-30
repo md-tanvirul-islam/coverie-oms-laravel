@@ -14,7 +14,7 @@ class UpdateExpressTypeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:express_types,name,' . $this->express_types->id,
+            'name' => 'required|string|max:255|unique:express_types,name,' . $this->express_type->id,
             'description' => 'nullable|string|max:1000',
             'is_active' => 'required|boolean',
             'created_by' => 'nullable|integer',
