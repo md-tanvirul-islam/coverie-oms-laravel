@@ -32,6 +32,8 @@ class IncomeTypeController extends Controller
     {
         $data = $request->validated();
 
+        $data['team_id'] = getPermissionsTeamId();
+
         $data['created_by'] = Auth::id();
 
         $this->service->create($data);
@@ -64,41 +66,5 @@ class IncomeTypeController extends Controller
         $this->service->delete($income_type);
 
         return back()->with('success', 'Income Type deleted.');
-    }
-
-    public function import()
-    {
-        return view('income_types.import');
-    }
-
-    public function importStore(Request $request)
-    {
-        $request->validate(['file' => 'required|file|mimes:xlsx,csv']);
-
-        try {
-            $import = new IncomeTypesImport;
-            Excel::import($import, $request->file('file'));
-
-            if ($import->failures()->isNotEmpty()) {
-                $errors = [];
-                foreach ($import->failures() as $failure) {
-                    $errors[] = [
-                        "row" => $failure->row(),
-                        "errors" => implode(',', $failure->errors()),
-                    ];
-                }
-                return back()->with("import_errors", $errors);
-            }
-
-            return back()->with('success', 'Excel imported successfully.');
-        } catch (\Exception $e) {
-            Log::error('IncomeType import failed: ' . $e->getMessage(), ['exception' => $e]);
-            return back()->with('error', 'Import failed. Please check the file and try again.');
-        }
-    }
-
-    public function export()
-    {
-        return Excel::download(new IncomeTypesExport, 'IncomeTypes.xlsx');
     }
 }

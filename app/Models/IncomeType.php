@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use App\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class IncomeType extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasTeamScope;
 
     protected $fillable = [
+        'team_id',
         'name',
         'description',
         'is_active',

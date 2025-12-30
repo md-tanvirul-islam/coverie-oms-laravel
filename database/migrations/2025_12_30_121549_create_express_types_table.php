@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('express_types', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('team_id');
             $table->string('name', 255);
             $table->text('description');
             $table->boolean('is_active');
