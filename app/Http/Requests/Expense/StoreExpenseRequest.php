@@ -19,8 +19,9 @@ class StoreExpenseRequest extends FormRequest
             'employee_id' => 'nullable|exists:employees,id',
             'amount' => 'required|numeric|min:0',
             'expense_date' => 'required|date',
-            'reference' => 'nullable|string|max:255',
             'note' => 'nullable|string|max:2000',
+            'documents' => 'nullable|array',
+            'documents.*' => 'file|max:2048|mimes:pdf,jpg,jpeg,png,doc,docx',
         ];
     }
 }

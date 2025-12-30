@@ -21,10 +21,7 @@ class ExpensesImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'employee_id' => $row['employee_id'],
             'amount' => $row['amount'],
             'expense_date' => $row['expense_date'],
-            'reference' => $row['reference'],
-            'note' => $row['note'],
-            'created_by' => $row['created_by'],
-            'updated_by' => $row['updated_by']
+            'note' => $row['note']
         ]);
     }
 
@@ -36,7 +33,6 @@ class ExpensesImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'employee_id' => 'nullable|exists:employees,code',
             'amount' => 'required|numeric|min:0',
             'expense_date' => 'required|date',
-            'reference' => 'nullable|string|max:255',
             'note' => 'nullable|string|max:2000'
         ];
     }

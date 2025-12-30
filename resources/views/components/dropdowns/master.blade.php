@@ -3,7 +3,7 @@
 <select name="{{ $name }}"
     {{ $attributes->class(['form-select', 'is-invalid' => $errors->has($name), 'select2']) }}>
     @if (!$attributes->get('multiple'))
-        <option>Select One</option>
+        <option value="">Select One</option>
     @endif
 
     @foreach ($options as $value => $label)

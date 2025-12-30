@@ -19,7 +19,6 @@ class FilterExpenseRequest extends FormRequest
             'employee_id' => 'nullable',
             'amount' => 'nullable',
             'expense_date' => 'nullable',
-            'reference' => 'string|nullable',
             'note' => 'string|nullable',
             'created_by' => 'integer|nullable',
             'updated_by' => 'integer|nullable',

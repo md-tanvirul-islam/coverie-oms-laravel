@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LaravelJutsu\Artifact\Concerns\HasArtifacts;
 
 class Expense extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes, HasArtifacts, HasTeamScope;
 
     protected $fillable = [
         'team_id',
@@ -23,7 +25,7 @@ class Expense extends Model
         'updated_by',
     ];
 
-    public function type()
+    public function expenseType()
     {
         return $this->belongsTo(ExpenseType::class, 'expense_type_id');
     }
@@ -46,5 +48,10 @@ class Expense extends Model
     public function updater()
     {
         return $this->belongsTo(User::class, 'updated_by');
+    }
+
+    public function documents()
+    {
+        return $this->manyArtifacts('documents');
     }
 }
