@@ -2,24 +2,23 @@
 
 namespace App\DataTables;
 
-use App\Http\Requests\ExpenseType\FilterExpenseTypeRequest;
-use App\Services\ExpenseTypeService;
+use App\Http\Requests\Expense\FilterExpenseRequest;
+use App\Services\ExpenseService;
 use Yajra\DataTables\Services\DataTable;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
 
-class ExpenseTypesDataTable extends DataTable
+class ExpensesDataTable extends DataTable
 {
     public function dataTable($query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('is_active', fn($row) => $row->is_active ? 'Yes' : 'No')
-            ->addColumn('action', 'expense_types.action')
+            ->addColumn('action', 'expenses.action')
             ->setRowId('id');
     }
 
-    public function query(FilterExpenseTypeRequest $request, ExpenseTypeService $service)
+    public function query(FilterExpenseRequest $request, ExpenseService $service)
     {
         $data = $request->validated();
 
@@ -29,7 +28,7 @@ class ExpenseTypesDataTable extends DataTable
     public function html()
     {
         return $this->builder()
-            ->setTableId('expense_types_table')
+            ->setTableId('expenses_table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
@@ -47,9 +46,13 @@ class ExpenseTypesDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('name'),
-            Column::make('description'),
-            Column::make('is_active'),
+            Column::make('expense_type_id'),
+            Column::make('store_id'),
+            Column::make('employee_id'),
+            Column::make('amount'),
+            Column::make('expense_date'),
+            Column::make('reference'),
+            Column::make('note'),
             Column::computed('action')
                 ->exportable(false)
                 ->printable(false)
@@ -60,6 +63,6 @@ class ExpenseTypesDataTable extends DataTable
 
     protected function filename(): string
     {
-        return 'ExpenseTypes_' . date('YmdHis');
+        return 'Expenses_' . date('YmdHis');
     }
 }

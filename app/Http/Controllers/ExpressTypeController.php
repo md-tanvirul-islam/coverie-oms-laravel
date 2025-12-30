@@ -2,33 +2,33 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\ExpressTypesDataTable;
-use App\Exports\ExpressTypesExport;
-use App\Http\Requests\ExpressType\StoreExpressTypeRequest;
-use App\Http\Requests\ExpressType\UpdateExpressTypeRequest;
-use App\Imports\ExpressTypesImport;
-use App\Models\ExpressType;
-use App\Services\ExpressTypeService;
+use App\DataTables\ExpenseTypesDataTable;
+use App\Exports\ExpenseTypesExport;
+use App\Http\Requests\ExpenseType\StoreExpenseTypeRequest;
+use App\Http\Requests\ExpenseType\UpdateExpenseTypeRequest;
+use App\Imports\ExpenseTypesImport;
+use App\Models\ExpenseType;
+use App\Services\ExpenseTypeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
-class ExpressTypeController extends Controller
+class ExpenseTypeController extends Controller
 {
-    public function __construct(private ExpressTypeService $service) {}
+    public function __construct(private ExpenseTypeService $service) {}
 
-    public function index(ExpressTypesDataTable $dataTable)
+    public function index(ExpenseTypesDataTable $dataTable)
     {
-        return $dataTable->render('express_types.index');
+        return $dataTable->render('expense_types.index');
     }
 
     public function create()
     {
-        return view('express_types.create');
+        return view('expense_types.create');
     }
 
-    public function store(StoreExpressTypeRequest $request)
+    public function store(StoreExpenseTypeRequest $request)
     {
         $data = $request->validated();
 
@@ -39,32 +39,32 @@ class ExpressTypeController extends Controller
         $this->service->create($data);
 
         return redirect()
-            ->route('express_types.index')
-            ->with('success', 'Express Type created.');
+            ->route('expense_types.index')
+            ->with('success', 'Expense Type created.');
     }
 
-    public function edit(ExpressType $express_type)
+    public function edit(ExpenseType $expense_type)
     {
-        return view('express_types.edit', compact('express_type'));
+        return view('expense_types.edit', compact('expense_type'));
     }
 
-    public function update(UpdateExpressTypeRequest $request, ExpressType $express_type)
+    public function update(UpdateExpenseTypeRequest $request, ExpenseType $expense_type)
     {
         $data = $request->validated();
 
         $data['updated_by'] = Auth::id();
 
-        $this->service->update($express_type, $data);
+        $this->service->update($expense_type, $data);
 
         return redirect()
-            ->route('express_types.index')
-            ->with('success', 'Express Type updated.');
+            ->route('expense_types.index')
+            ->with('success', 'Expense Type updated.');
     }
 
-    public function destroy(ExpressType $express_type)
+    public function destroy(ExpenseType $expense_type)
     {
-        $this->service->delete($express_type);
+        $this->service->delete($expense_type);
 
-        return back()->with('success', 'Express Type deleted.');
+        return back()->with('success', 'Expense Type deleted.');
     }
 }

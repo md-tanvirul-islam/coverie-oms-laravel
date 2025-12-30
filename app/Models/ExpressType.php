@@ -6,7 +6,7 @@ use App\Traits\HasTeamScope;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ExpressType extends Model
+class ExpenseType extends Model
 {
     use SoftDeletes, HasTeamScope;
 

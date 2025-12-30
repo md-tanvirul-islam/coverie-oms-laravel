@@ -5,12 +5,14 @@
         <div class="card">
 
             <div class="card-header d-flex justify-content-between align-items-center">
-                <span>Manage Expense Types</span>
+                <span>Manage Expenses</span>
 
                 <div class="btn-group" role="group">
+                    <a href="{{ route('expenses.import') }}" class="btn btn-primary"><i class="bi bi-upload"></i> Import Excel</a>
+<a href="{{ route('expenses.export') }}" class="btn btn-success"><i class="bi bi-download"></i> Export Excel</a>
 
-                    <a href="{{ route('expense_types.create') }}" class="btn btn-primary">
-                        <i class="bi bi-plus-circle"></i> Add Expense Type
+                    <a href="{{ route('expenses.create') }}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add Expense
                     </a>
                 </div>
             </div>

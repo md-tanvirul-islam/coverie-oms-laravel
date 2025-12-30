@@ -91,12 +91,12 @@
                             </li>
                         @endcan
 
-                        {{-- Express Types --}}
+                        {{-- Expense Types --}}
                         @can(\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value)
                             <li class="nav-item">
-                                <a href="{{ route('express_types.index') }}"
-                                    class="nav-link {{ request()->routeIs('express_types.*') ? 'active' : '' }}">
-                                    Express Types
+                                <a href="{{ route('expense_types.index') }}"
+                                    class="nav-link {{ request()->routeIs('expense_types.*') ? 'active' : '' }}">
+                                    Expense Types
                                 </a>
                             </li>
                         @endcan

@@ -2,15 +2,15 @@
 
 namespace App\Services;
 
-use App\Models\ExpressType;
+use App\Models\ExpenseType;
 
-class ExpressTypeService
+class ExpenseTypeService
 {
     public function list($data = [], $is_query_only = false, $is_paginated = true)
     {
         $order = "asc";
 
-        $query = ExpressType::query();
+        $query = ExpenseType::query();
 
         $query = $query->with([]);
 
@@ -37,32 +37,32 @@ class ExpressTypeService
 
         if ($is_paginated === true) {
             $item_per_page = isset($data['item_per_page']) ? $data['item_per_page'] : config('constants.pagination.per_page');
-            $express_types = $query->paginate($item_per_page)->appends($data);
-            $express_types->pagination_summary = get_pagination_summary($express_types);
+            $expense_types = $query->paginate($item_per_page)->appends($data);
+            $expense_types->pagination_summary = get_pagination_summary($expense_types);
         } else {
-            $express_types = $query->get();
+            $expense_types = $query->get();
         }
 
-        return $express_types;
+        return $expense_types;
     }
 
     public function create(array $data)
     {
-        return ExpressType::create($data);
+        return ExpenseType::create($data);
     }
 
-    public function update(ExpressType $model, array $data)
+    public function update(ExpenseType $model, array $data)
     {
         return $model->update($data);
     }
 
-    public function delete(ExpressType $model)
+    public function delete(ExpenseType $model)
     {
         return $model->delete();
     }
 
     public function find($id)
     {
-        return ExpressType::findOrFail($id);
+        return ExpenseType::findOrFail($id);
     }
 }

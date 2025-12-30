@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\ExpressType;
+namespace App\Http\Requests\ExpenseType;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class FilterExpressTypeRequest extends FormRequest
+class FilterExpenseTypeRequest extends FormRequest
 {
     public function authorize(): bool
     {
