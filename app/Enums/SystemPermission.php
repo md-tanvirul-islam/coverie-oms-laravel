@@ -24,6 +24,11 @@ enum SystemPermission: string
     case STORE_UPDATE = 'store.update';
     case STORE_DELETE = 'store.delete';
 
+    case ITEM_CREATE = 'item.create';
+    case ITEM_READ   = 'item.read';
+    case ITEM_UPDATE = 'item.update';
+    case ITEM_DELETE = 'item.delete';
+
     case ORDER_CREATE = 'order.create';
     case ORDER_READ   = 'order.read';
     case ORDER_UPDATE = 'order.update';

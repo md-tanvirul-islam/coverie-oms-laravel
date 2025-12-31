@@ -7,6 +7,7 @@ use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\IncomeTypeController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
@@ -64,6 +65,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('incomes/import', [IncomeController::class, 'importStore'])->name('incomes.import.store');
     Route::get('incomes/export', [IncomeController::class, 'export'])->name('incomes.export');
     Route::resource('incomes', IncomeController::class);
+
+    Route::resource('items', ItemController::class);
 
     Route::get('reports/employee_commission/daily', [ReportController::class, 'employeeCommissionDailyReport'])
         ->name('reports.employee_commission.daily');

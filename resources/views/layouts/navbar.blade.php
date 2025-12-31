@@ -71,25 +71,48 @@
                             </li>
                         @endcan
 
-                        {{-- Orders --}}
-                        @can(\App\Enums\SystemPermission::ORDER_READ->value)
-                            <li class="nav-item">
-                                <a href="{{ route('orders.index') }}"
-                                    class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                        {{-- Order --}}
+                        @canany([\App\Enums\SystemPermission::ORDER_READ->value,
+                            \App\Enums\SystemPermission::COURIER_PAID_INVOICE_READ->value])
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {{ request()->routeIs('orders.*') ? 'active' : '' }}"
+                                    href="#" data-bs-toggle="dropdown">
                                     Orders
                                 </a>
-                            </li>
-                        @endcan
 
-                        {{-- Courier Paid Invoices --}}
-                        @can(\App\Enums\SystemPermission::COURIER_PAID_INVOICE_READ->value)
-                            <li class="nav-item">
-                                <a href="{{ route('courier_paid_invoices.index') }}"
-                                    class="nav-link {{ request()->routeIs('courier_paid_invoices.*') ? 'active' : '' }}">
-                                    Courier Paid Invoices
-                                </a>
+                                <ul class="dropdown-menu">
+                                    {{-- Items --}}
+                                    @can(\App\Enums\SystemPermission::ITEM_READ->value)
+                                        <li>
+                                            <a href="{{ route('items.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('items.*') ? 'active' : '' }}">
+                                                Items
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    {{-- Orders --}}
+                                    @can(\App\Enums\SystemPermission::ORDER_READ->value)
+                                        <li>
+                                            <a href="{{ route('orders.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                                                Orders
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    {{-- Courier Paid Invoices --}}
+                                    @can(\App\Enums\SystemPermission::COURIER_PAID_INVOICE_READ->value)
+                                        <li>
+                                            <a href="{{ route('courier_paid_invoices.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('courier_paid_invoices.*') ? 'active' : '' }}">
+                                                Courier Paid Invoices
+                                            </a>
+                                        </li>
+                                    @endcan
+                                </ul>
                             </li>
-                        @endcan
+                        @endcanany
 
                         {{-- Expense --}}
                         @canany([\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value,

@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Role;
+use App\Models\Store;
 use Spatie\Permission\PermissionRegistrar;
 
 class TeamService
@@ -128,6 +129,17 @@ class TeamService
                 [
                     'name' => $user->name,
                     'user_id' => $user->id,
+                ]
+            );
+
+            $store = Store::updateOrCreate(
+                [
+                    'name' => 'Coverie',
+                    'team_id' => $team->id,
+                ],
+                [
+                    'status' => 1,
+                    'type' => 'DIGITAL',
                 ]
             );
 
