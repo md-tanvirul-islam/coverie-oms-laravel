@@ -56,7 +56,7 @@ class OrderImport implements
 
         return new Order([
             'employee_id'     => $store?->id,
-            'invoice_id'       => (string) $row['invoice_id'],
+            'invoice_code'       => (string) $row['invoice_code'],
             'order_date'       => $orderDate,
             'customer_name'    => $row['customer_name'],
             'customer_phone'   => $customerPhone,
@@ -72,7 +72,7 @@ class OrderImport implements
     {
         return [
             '*.store'            => 'required|exists:stores,name',
-            '*.invoice_id'       => ['required', 'string', Rule::unique('orders', 'invoice_id')],
+            '*.invoice_code'       => ['required', 'string', Rule::unique('orders', 'invoice_code')],
             '*.order_date'       => ['required', function ($attribute, $value, $fail) {
 
                 // Accept numeric Excel dates
@@ -104,7 +104,7 @@ class OrderImport implements
     public function customValidationMessages()
     {
         return [
-            '*.invoice_id.unique' => 'Invoice ID already exists.',
+            '*.invoice_code.unique' => 'Invoice ID already exists.',
             '*.order_taken_by.exists' => 'Employee code not found.',
             '*.order_date.required' => 'Order date is required.',
         ];

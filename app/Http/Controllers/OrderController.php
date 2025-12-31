@@ -7,10 +7,13 @@ use App\Exports\OrdersExport;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Imports\OrderImport;
+use App\Models\Item;
 use App\Services\OrderService;
 use App\Models\Order;
 use App\Services\EmployeeService;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -23,22 +26,36 @@ class OrderController extends Controller
         return $dataTable->render('orders.index');
     }
 
-    public function create(EmployeeService $employeeService)
+    public function create(EmployeeService $employeeService, ItemService $itemService)
     {
         $employees = $employeeService->dropdown();
-        return view('orders.create', compact('employees'));
+        $items = $itemService->dropdown();
+        return view('orders.create', compact('employees', 'items'));
     }
 
     public function store(StoreOrderRequest $request)
     {
-        $this->service->create($request->validated());
-        return redirect()->route('orders.index')->with('success', 'Order created.');
+        $data = $request->validated();
+        $data['team_id'] = getPermissionsTeamId();
+
+        try {
+            DB::beginTransaction();
+            $this->service->create($data);
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Order created.');
+        } catch (\Exception $e) {
+            dd($e);
+            DB::rollBack();
+            log_exception($e, 'Order creation failed');
+            return back()->with('error', 'Order creation failed. Please try again.');
+        }
     }
 
-    public function edit(Order $order, EmployeeService $employeeService)
+    public function edit(Order $order, EmployeeService $employeeService, ItemService $itemService)
     {
         $employees = $employeeService->dropdown();
-        return view('orders.edit', compact('order', 'employees'));
+        $items = $itemService->dropdown();
+        return view('orders.edit', compact('order', 'employees', 'items'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
@@ -74,7 +91,7 @@ class OrderController extends Controller
                 foreach ($import->failures() as $failure) {
                     $errors[] = [
                         "row"    => $failure->row(),
-                        "errors" => implode(',', $failure->errors()), 
+                        "errors" => implode(',', $failure->errors()),
                     ];
                 }
 

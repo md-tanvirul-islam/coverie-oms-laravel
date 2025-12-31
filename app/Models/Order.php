@@ -11,16 +11,18 @@ class Order extends Model
     use SoftDeletes, HasTeamScope;
 
     protected $fillable = [
+        'team_id',
         'store_id',
-        'invoice_id',
+        'invoice_code',
+        'taker_employee_id',
         'order_date',
         'customer_name',
         'customer_phone',
         'customer_address',
-        'total_cost',
-        'phone_model',
-        'employee_id',
-        'quantity',
+        'total_quantity',
+        'sub_total',
+        'discount',
+        'total_cost'
     ];
 
     public function store()
@@ -31,5 +33,10 @@ class Order extends Model
     public function employee()
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function items()
+    {
+        return $this->hasMany(OrderItem::class);
     }
 }

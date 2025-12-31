@@ -23,14 +23,14 @@ class UpdateOrderRequest extends FormRequest
     {
         return [
             'store_id'       => 'required|exists:stores,id',
-            'invoice_id'       => 'required|string|max:50|unique:orders,invoice_id,' . $this->order->id,
+            'invoice_code'       => 'required|string|max:50|unique:orders,invoice_code,' . $this->order->id,
             'order_date'       => 'required|date',
             'customer_name'    => 'required|string|max:255',
             'customer_phone'   => 'required|string|max:50',
             'customer_address' => 'nullable|string|max:500',
             'total_cost'       => 'required|numeric|min:0',
             'phone_model'      => 'required|string|max:255',
-            'employee_id'     => 'required|exists:employees,id',
+            'taker_employee_id'     => 'required|exists:employees,id',
             'quantity'         => 'required|integer|min:1',
         ];
     }

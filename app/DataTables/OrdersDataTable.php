@@ -25,7 +25,7 @@ class OrdersDataTable extends DataTable
         return $model->with(['employee:id,name,code', 'store:id,name'])->newQuery();
     }
 
-        public function html()
+    public function html()
     {
         return $this->builder()
             ->setTableId('orders-table')
@@ -48,14 +48,15 @@ class OrdersDataTable extends DataTable
     {
         return [
             Column::make('store'),
-            Column::make('invoice_id'),
+            Column::make('invoice_code'),
             Column::make('order_date'),
             Column::make('customer_name'),
             Column::make('customer_phone'),
             Column::make('customer_address'),
-            Column::make('quantity'),
+            Column::make('total_quantity'),
+            Column::make('sub_total'),
+            Column::make('discount'),
             Column::make('total_cost'),
-            Column::make('phone_model'),
             Column::make('employee')->title('Order Taken By'),
 
             Column::computed('action')
