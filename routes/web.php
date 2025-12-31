@@ -66,6 +66,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('incomes/export', [IncomeController::class, 'export'])->name('incomes.export');
     Route::resource('incomes', IncomeController::class);
 
+    Route::get('/items/{item}/attributes', function (\App\Models\Item $item) {
+        $item->load('attributes:id,item_id,label,type,options');
+
+        return response()->json([
+            'attributes' => $item->attributes->map(fn($attr) => [
+                'id'      => $attr->id,
+                'label'   => $attr->label,
+                'type'    => $attr->type,
+                'options' => $attr->options ?? [],
+                'key'     => 'attr_' . $attr->id, // runtime key
+            ]),
+        ]);
+    });
+
+
     Route::resource('items', ItemController::class);
 
     Route::get('reports/employee_commission/daily', [ReportController::class, 'employeeCommissionDailyReport'])

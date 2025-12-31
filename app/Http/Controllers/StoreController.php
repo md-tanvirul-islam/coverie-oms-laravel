@@ -29,7 +29,8 @@ class StoreController extends Controller
 
     public function create()
     {
-        return view('stores.create');
+        // return view('stores.create');
+        return L
     }
 
     public function store(StoreStoreRequest $request)

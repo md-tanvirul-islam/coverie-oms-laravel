@@ -7,7 +7,7 @@
         <form method="POST" action="{{ route('orders.store') }}">
             @csrf
 
-            {{-- Store --}}
+            {{-- Invoice ID --}}
             <div class="mb-3">
                 <label class="form-label">Store</label>
                 <x-dropdowns.select-store name="store_id" :selected="old('store_id')" />
@@ -65,6 +65,36 @@
                 @enderror
             </div>
 
+            {{-- Quantity --}}
+            <div class="mb-3">
+                <label class="form-label">Quantity</label>
+                <input type="number" step="1" name="quantity" value="{{ old('quantity') }}"
+                    class="form-control @error('quantity') is-invalid @enderror" required>
+                @error('quantity')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Total Cost --}}
+            <div class="mb-3">
+                <label class="form-label">Total Cost</label>
+                <input type="number" step="0.01" name="total_cost" value="{{ old('total_cost') }}"
+                    class="form-control @error('total_cost') is-invalid @enderror" required>
+                @error('total_cost')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
+            {{-- Phone Model --}}
+            <div class="mb-3">
+                <label class="form-label">Phone Model</label>
+                <input name="phone_model" value="{{ old('phone_model') }}"
+                    class="form-control @error('phone_model') is-invalid @enderror" required>
+                @error('phone_model')
+                    <div class="invalid-feedback">{{ $message }}</div>
+                @enderror
+            </div>
+
             {{-- Order Taken By (Employee) --}}
             <div class="mb-3">
                 <label class="form-label">Order Taken By</label>
@@ -79,10 +109,6 @@
                 @error('employee_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-            </div>
-
-            <div class="mb-3">
-                <x-invoice-form/>
             </div>
 
             <button class="btn btn-primary">Create</button>

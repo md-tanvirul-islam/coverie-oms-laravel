@@ -123,4 +123,9 @@ class ItemService
     {
         return Item::findOrFail($id);
     }
+
+    public function dropdown()
+    {
+        return Item::where('is_active', true)->pluck('name', 'id')->toArray();
+    }
 }
