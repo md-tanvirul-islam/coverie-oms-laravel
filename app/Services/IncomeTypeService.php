@@ -65,4 +65,9 @@ class IncomeTypeService
     {
         return IncomeType::findOrFail($id);
     }
+
+    public function dropdown()
+    {
+        return IncomeType::pluck('name', 'id')->toArray();
+    }
 }

@@ -4,10 +4,10 @@ use App\Http\Controllers\CourierPaidInvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ExpenseTypeController;
 use App\Http\Controllers\IncomeTypeController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\StoreController;
@@ -52,12 +52,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('stores', StoreController::class);
 
     Route::resource('expense_types', ExpenseTypeController::class);
-    Route::resource('income_types', IncomeTypeController::class);
 
     Route::get('expenses/import', [ExpenseController::class, 'import'])->name('expenses.import');
     Route::post('expenses/import', [ExpenseController::class, 'importStore'])->name('expenses.import.store');
     Route::get('expenses/export', [ExpenseController::class, 'export'])->name('expenses.export');
     Route::resource('expenses', ExpenseController::class);
+
+    Route::resource('income_types', IncomeTypeController::class);
+
+    Route::get('incomes/import', [IncomeController::class, 'import'])->name('incomes.import');
+    Route::post('incomes/import', [IncomeController::class, 'importStore'])->name('incomes.import.store');
+    Route::get('incomes/export', [IncomeController::class, 'export'])->name('incomes.export');
+    Route::resource('incomes', IncomeController::class);
 
     Route::get('reports/employee_commission/daily', [ReportController::class, 'employeeCommissionDailyReport'])
         ->name('reports.employee_commission.daily');
@@ -73,8 +79,3 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 require __DIR__ . '/auth.php';
-
-Route::get('expenses/import', [ExpenseController::class, 'import'])->name('expenses.import');
-Route::post('expenses/import', [ExpenseController::class, 'importStore'])->name('expenses.import.store');
-Route::get('expenses/export', [ExpenseController::class, 'export'])->name('expenses.export');
-Route::resource('expenses', ExpenseController::class);

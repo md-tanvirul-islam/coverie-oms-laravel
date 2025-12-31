@@ -146,14 +146,14 @@
                                     @endcan
 
                                     {{-- Income --}}
-                                    {{-- @can(\App\Enums\SystemPermission::INCOME_READ->value)
+                                    @can(\App\Enums\SystemPermission::INCOME_READ->value)
                                         <li>
                                             <a href="{{ route('incomes.index') }}"
                                                 class="dropdown-item {{ request()->routeIs('incomes.*') ? 'active' : '' }}">
                                                 Incomes
                                             </a>
                                         </li>
-                                    @endcan --}}
+                                    @endcan
                                 </ul>
                             </li>
                         @endcanany

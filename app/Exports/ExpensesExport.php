@@ -12,7 +12,7 @@ class ExpensesExport implements FromCollection, WithHeadings, WithMapping
     public function collection()
     {
         return Expense::query()
-            ->orderBy('id', 'DESC')
+            ->orderBy('expense_date', 'DESC')
             ->get();
     }
 
