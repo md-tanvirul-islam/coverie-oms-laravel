@@ -9,8 +9,10 @@ use App\Http\Requests\Item\UpdateItemRequest;
 use App\Imports\ItemsImport;
 use App\Models\Item;
 use App\Services\ItemService;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -36,15 +38,26 @@ class ItemController extends Controller
 
         $data['created_by'] = Auth::id();
 
-        $this->service->create($data);
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('items.index')
-            ->with('success', 'Item created.');
+            $this->service->create($data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('items.index')
+                ->with('success', 'Item created.');
+        } catch (Exception $e) {
+            DB::rollBack();
+            log_exception($e, 'Failed to create item.');
+            return back()->withInput()->with('error', 'Failed to create item. Try again.');
+        }
     }
 
     public function edit(Item $item)
     {
+        $item = $item->load('attributes');
         return view('items.edit', compact('item'));
     }
 
@@ -52,13 +65,27 @@ class ItemController extends Controller
     {
         $data = $request->validated();
 
+        $data['team_id'] = getPermissionsTeamId();
+
         $data['updated_by'] = Auth::id();
 
-        $this->service->update($item, $data);
+        try {
+            DB::beginTransaction();
 
-        return redirect()
-            ->route('items.index')
-            ->with('success', 'Item updated.');
+            $this->service->update($item, $data);
+
+            DB::commit();
+
+            return redirect()
+                ->route('items.index')
+                ->with('success', 'Item updated.');
+
+        } catch (Exception $e) {
+            dd($e);
+            DB::rollBack();
+            log_exception($e, 'Failed to update item.');
+            return back()->withInput()->with('error', 'Failed to update item. Try again.');
+        }
     }
 
     public function destroy(Item $item)

@@ -58,12 +58,60 @@ class ItemService
 
     public function create(array $data)
     {
-        return Item::create($data);
+        $item = Item::create($data);
+
+        foreach ($data['item_attributes'] ?? [] as $attr) {
+            $attribute = $item->attributes()->create([
+                'store_id'    => $data['store_id'],
+                'team_id'     => $data['team_id'],
+                'label'       => $attr['label'],
+                'type'        => $attr['type'],
+                'options'     => isset($attr['options'])
+                    ? array_map('trim', explode(',', $attr['options']))
+                    : null,
+                'is_required' => $attr['is_required'] ?? false,
+                'sort_order'  => $attr['sort_order'] ?? 0,
+            ]);
+        }
+
+        return $item;
     }
 
-    public function update(Item $model, array $data)
+    public function update(Item $item, array $data)
     {
-        return $model->update($data);
+        $item->update($data);
+
+        $ids = [];
+
+        foreach ($data['item_attributes'] ?? [] as $attr) {
+
+            $payload = [
+                'store_id'    => $data['store_id'],
+                'team_id'     => $data['team_id'],
+                'label'       => $attr['label'],
+                'type'        => $attr['type'],
+                'options'     => isset($attr['options'])
+                    ? array_map('trim', explode(',', $attr['options']))
+                    : null,
+                'is_required' => $attr['is_required'] ?? false,
+                'sort_order'  => $attr['sort_order'] ?? 0,
+            ];
+
+            $attribute = $item->attributes()->updateOrCreate(
+                ['id' => $attr['id'] ?? null],
+                $payload
+            );
+
+            $ids[] = $attribute->id;
+        }
+
+        // Delete removed attributes
+        $item->attributes()
+            ->when($ids, fn($q) => $q->whereNotIn('id', $ids))
+            ->when(empty($ids), fn($q) => $q)
+            ->delete();
+
+        return $item;
     }
 
     public function delete(Item $model)
