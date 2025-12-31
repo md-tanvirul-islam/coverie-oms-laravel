@@ -21,6 +21,8 @@ class StoreOrderRequest extends FormRequest
      */
     public function rules(): array
     {
+        dd($this->all());
+
         return [
             'store_id'       => 'required|exists:stores,id',
             'invoice_id'       => 'required|string|max:50|unique:orders,invoice_id',

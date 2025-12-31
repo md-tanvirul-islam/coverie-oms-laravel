@@ -7,12 +7,15 @@ use App\Exports\OrdersExport;
 use App\Http\Requests\Order\StoreOrderRequest;
 use App\Http\Requests\Order\UpdateOrderRequest;
 use App\Imports\OrderImport;
+use App\Models\Item;
 use App\Services\OrderService;
 use App\Models\Order;
 use App\Services\EmployeeService;
+use App\Services\ItemService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
+use Spatie\LaravelData\Attributes\Validation\In;
 
 class OrderController extends Controller
 {
@@ -23,10 +26,11 @@ class OrderController extends Controller
         return $dataTable->render('orders.index');
     }
 
-    public function create(EmployeeService $employeeService)
+    public function create(EmployeeService $employeeService, ItemService $itemService)
     {
         $employees = $employeeService->dropdown();
-        return view('orders.create', compact('employees'));
+        $items = $itemService->dropdown();
+        return view('orders.create', compact('employees', 'items'));
     }
 
     public function store(StoreOrderRequest $request)
