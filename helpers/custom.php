@@ -1,6 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 
 function get_pagination_summary($data)
 {
@@ -48,4 +50,18 @@ function log_exception(Throwable $e, string $context, array $extra = []): void
         'trace'     => collect($e->getTrace())->take(10)->all(), // limit noise
         'extra'     => $extra,
     ]);
+}
+
+
+function excelDateToDateTimeString($excel_date)
+{
+    if (is_numeric($excel_date)) {
+        $excel_date = Carbon::instance(
+            Date::excelToDateTimeObject($excel_date)
+        )->format('Y-m-d H:i:s');
+    } else {
+        $excel_date = Carbon::parse($excel_date)->format('Y-m-d H:i:s');
+    }
+
+    return $excel_date;
 }

@@ -80,7 +80,6 @@ class ExpenseController extends Controller
         try {
             $import = new ExpensesImport;
             Excel::import($import, $request->file('file'));
-
             if ($import->failures()->isNotEmpty()) {
                 $errors = [];
                 foreach ($import->failures() as $failure) {
@@ -101,6 +100,7 @@ class ExpenseController extends Controller
 
     public function export()
     {
-        return Excel::download(new ExpensesExport, 'Expenses.xlsx');
+        $time = now()->format('Y-m-d_H-i-s');
+        return Excel::download(new ExpensesExport, "expenses_{$time}.xlsx");
     }
 }

@@ -5,14 +5,13 @@ namespace App\Imports;
 use App\Enums\CourierName;
 use App\Models\CourierPaidInvoice;
 use App\Models\Order;
-use Illuminate\Support\Carbon;
+use App\Rules\ExcelDate;
 use Illuminate\Validation\Rule;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use Maatwebsite\Excel\Concerns\WithValidation;
 use Maatwebsite\Excel\Concerns\SkipsOnFailure;
 use Maatwebsite\Excel\Concerns\SkipsFailures;
-use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 
 class CourierPaidInvoiceImport implements
     ToModel,
@@ -22,10 +21,7 @@ class CourierPaidInvoiceImport implements
 {
     use SkipsFailures;
 
-    public function __construct(public $courier_name = CourierName::PATHAO)
-    {
-        
-    }   
+    public function __construct(public $courier_name = CourierName::PATHAO) {}
 
     public function model(array $row)
     {
@@ -35,13 +31,7 @@ class CourierPaidInvoiceImport implements
         $createdDate = $row['created_date'] ?? null;
 
         if ($createdDate) {
-            if (is_numeric($createdDate)) {
-                $createdDate = Carbon::instance(
-                    ExcelDate::excelToDateTimeObject($createdDate)
-                )->format('Y-m-d H:i:s');
-            } else {
-                $createdDate = Carbon::parse($createdDate)->format('Y-m-d H:i:s');
-            }
+            $createdDate = excelDateToDateTimeString($createdDate);
         }
 
         // ----------------------------
@@ -105,19 +95,7 @@ class CourierPaidInvoiceImport implements
                 'string',
                 Rule::unique('courier_paid_invoices', 'consignment_id'),
             ],
-            '*.created_date'      => ['required', function ($attribute, $value, $fail) {
-                if (is_numeric($value)) {
-                    try {
-                        ExcelDate::excelToDateTimeObject($value);
-                        return;
-                    } catch (\Throwable $e) {
-                        return $fail("Invalid Excel date value.");
-                    }
-                }
-                if (!strtotime($value)) {
-                    return $fail("Invalid date format.");
-                }
-            }],
+            '*.created_date'      => ['required', new ExcelDate()],
             '*.invoice_type'      => 'nullable|string|max:50',
             '*.collected_amount'  => 'nullable|numeric|min:0',
             '*.recipient_name'    => 'nullable|string|max:255',

@@ -91,7 +91,7 @@
                             </li>
                         @endcan
 
-                        {{-- REPORTS --}}
+                        {{-- Expense --}}
                         @canany([\App\Enums\SystemPermission::EXPENSE_TYPE_READ->value,
                             \App\Enums\SystemPermission::EXPENSE_READ->value])
                             <li class="nav-item dropdown">
@@ -125,16 +125,38 @@
                             </li>
                         @endcanany
 
-
-                        {{-- Income Types --}}
-                        @can(\App\Enums\SystemPermission::INCOME_TYPE_READ->value)
-                            <li class="nav-item">
-                                <a href="{{ route('income_types.index') }}"
-                                    class="nav-link {{ request()->routeIs('income_types.*') ? 'active' : '' }}">
-                                    Income Types
+                        {{-- Income --}}
+                        @canany([\App\Enums\SystemPermission::INCOME_TYPE_READ->value,
+                            \App\Enums\SystemPermission::INCOME_READ->value])
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle {{ request()->routeIs('income.*') ? 'active' : '' }}"
+                                    href="#" data-bs-toggle="dropdown">
+                                    Incomes
                                 </a>
+
+                                <ul class="dropdown-menu">
+                                    {{-- Income Types --}}
+                                    @can(\App\Enums\SystemPermission::INCOME_TYPE_READ->value)
+                                        <li>
+                                            <a href="{{ route('income_types.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('income_types.*') ? 'active' : '' }}">
+                                                Income Types
+                                            </a>
+                                        </li>
+                                    @endcan
+
+                                    {{-- Income --}}
+                                    {{-- @can(\App\Enums\SystemPermission::INCOME_READ->value)
+                                        <li>
+                                            <a href="{{ route('incomes.index') }}"
+                                                class="dropdown-item {{ request()->routeIs('incomes.*') ? 'active' : '' }}">
+                                                Incomes
+                                            </a>
+                                        </li>
+                                    @endcan --}}
+                                </ul>
                             </li>
-                        @endcan
+                        @endcanany
 
                         {{-- REPORTS --}}
                         @canany([\App\Enums\SystemPermission::REPORT_EMPLOYEE_COMMISSION->value,
