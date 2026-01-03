@@ -30,9 +30,9 @@ class Order extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function employee()
+    public function taker()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(Employee::class, 'taker_employee_id');
     }
 
     public function items()

@@ -65,17 +65,28 @@
                     'items',
                     $order->items
                         ->map(function ($i) {
+                            $parsed_attributes = [];
+                            foreach ($i->attributes ?? [] as $key => $value) {
+                                $parsed_attributes[] = parseItemAttribute($key, $value);
+                            }
+                            $docs = [];
+                            foreach ($i->documents ?? [] as $doc) {
+                                $docs[] = ['id' => $doc->id, 'name' => $doc->file_name];
+                            }
                             return [
+                                'id' => $i->id,
                                 'item_id' => $i->item_id,
                                 'unit_price' => $i->unit_price,
                                 'quantity' => $i->quantity,
-                                'schema' => $i->attributes_schema ?? [],
+                                'schema' => $parsed_attributes ?? [],
                                 'attributes' => $i->attributes ?? [],
-                                'documents' => [],
+                                'documents' => $docs,
+                                'removed_document_ids' => [],
                             ];
                         })
                         ->toArray(),
                 );
+                // dd($orderItems);
             @endphp
 
             {{-- Invoice Items --}}
@@ -107,7 +118,6 @@
                                             @endforeach
                                         </select>
                                     </td>
-
                                     <td style="min-width:260px">
                                         <template x-for="attr in item.schema" :key="attr.key">
                                             <div class="mb-2">
@@ -207,39 +217,61 @@
         window.invoiceForm = function(preItems = [], preDiscount = 0) {
             return {
                 items: preItems.length ? preItems : [{
-                    item_id: '',
+                    id: null,
+                    item_id: null,
                     unit_price: 0,
                     quantity: 1,
                     schema: [],
                     attributes: {},
-                    documents: []
+                    documents: [],
+                    removed_document_ids: []
                 }],
+
                 discount: preDiscount,
+                removed_order_item_ids: [],
 
                 addItem() {
                     this.items.push({
-                        item_id: '',
+                        id: null,
+                        item_id: null,
                         unit_price: 0,
                         quantity: 1,
                         schema: [],
                         attributes: {},
-                        documents: []
+                        documents: [],
+                        removed_document_ids: []
                     });
                 },
 
                 removeItem(index) {
+                    const item = this.items[index];
+                    if (item.id) {
+                        this.removed_order_item_ids.push(item.id);
+                    }
                     if (this.items.length === 1) return;
                     this.items.splice(index, 1);
                 },
 
                 addFiles(event, index) {
-                    Array.from(event.target.files).forEach(file => this.items[index].documents.push(file));
+                    Array.from(event.target.files).forEach(file => {
+                        this.items[index].documents.push({
+                            id: null,
+                            name: file.name,
+                            file: file
+                        });
+                    });
                     event.target.value = '';
                 },
 
                 removeFile(itemIndex, fileIndex) {
+                    const doc = this.items[itemIndex].documents[fileIndex];
+                    if (doc.id) {
+                        this.items[itemIndex].removed_document_ids.push(doc.id);
+                    }
+
                     this.items[itemIndex].documents.splice(fileIndex, 1);
                 },
+
 
                 async loadAttributes(index) {
                     const itemId = this.items[index].item_id;
@@ -285,8 +317,16 @@
                     form.appendChild(this._input('taker_employee_id', document.querySelector(
                         'select[name="taker_employee_id"]').value));
                     form.appendChild(this._input('discount', this.discount));
+                    
+                    this.removed_order_item_ids.forEach(id => {
+                        form.appendChild(
+                            this._input('removed_order_item_ids[]', id)
+                        );
+                    });
 
                     this.items.forEach((item, index) => {
+                        console.log(item);
+                        form.appendChild(this._input(`items[${index}][id]`, item.id));
                         form.appendChild(this._input(`items[${index}][item_id]`, item.item_id));
                         form.appendChild(this._input(`items[${index}][unit_price]`, item.unit_price));
                         form.appendChild(this._input(`items[${index}][quantity]`, item.quantity));
@@ -296,8 +336,20 @@
                                 .attributes[key]));
                         });
 
-                        item.documents.forEach(file => {
-                            form.appendChild(this._fileInput(`items[${index}][documents][]`, file));
+                        // removed documents
+                        item.removed_document_ids.forEach(id => {
+                            form.appendChild(
+                                this._input(`items[${index}][removed_document_ids][]`, id)
+                            );
+                        });
+
+                        // new documents only
+                        item.documents.forEach(doc => {
+                            if (doc.file) {
+                                form.appendChild(
+                                    this._fileInput(`items[${index}][documents][]`, doc.file)
+                                );
+                            }
                         });
                     });
 

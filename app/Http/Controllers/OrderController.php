@@ -44,7 +44,6 @@ class OrderController extends Controller
             DB::commit();
             return redirect()->route('orders.index')->with('success', 'Order created.');
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
             log_exception($e, 'Order creation failed');
             return back()->with('error', 'Order creation failed. Please try again.');
@@ -60,8 +59,20 @@ class OrderController extends Controller
 
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        $this->service->update($order, $request->validated());
-        return redirect()->route('orders.index')->with('success', 'Order updated.');
+        $data = $request->validated();
+        $data['team_id'] = getPermissionsTeamId();
+
+        try {
+            DB::beginTransaction();
+            $this->service->update($order, $data);
+            DB::commit();
+
+            return redirect()->route('orders.index')->with('success', 'Order updated.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            log_exception($e, 'Order update failed');
+            return back()->with('error', 'Order update failed. Please try again.');
+        }
     }
 
     public function destroy(Order $order)

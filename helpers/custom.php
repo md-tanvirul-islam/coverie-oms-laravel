@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\ItemAttribute;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use PhpOffice\PhpSpreadsheet\Shared\Date;
@@ -64,4 +65,13 @@ function excelDateToDateTimeString($excel_date)
     }
 
     return $excel_date;
+}
+
+function parseItemAttribute($key, $value)
+{
+    $a = explode('_', $key);
+    $item_attribute = ItemAttribute::find($a[1], ['label', 'type', 'options', 'is_required'])->toArray();
+    $item_attribute['key'] = $key;
+    $item_attribute['value'] = $value;
+    return $item_attribute;
 }

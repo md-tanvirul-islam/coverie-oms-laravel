@@ -15,14 +15,14 @@ class OrdersDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('store', fn($row) => $row->store?->name ?? '-')
-            ->addColumn('employee', fn($row) => $row->employee?->name_and_code ?? '-')
+            ->addColumn('taker', fn($row) => $row->taker?->name_and_code ?? '-')
             ->addColumn('action', 'orders.action')
             ->setRowId('id');
     }
 
     public function query(Order $model): Builder
     {
-        return $model->with(['employee:id,name,code', 'store:id,name'])->newQuery();
+        return $model->with(['taker:id,name,code', 'store:id,name'])->newQuery();
     }
 
     public function html()
@@ -57,7 +57,7 @@ class OrdersDataTable extends DataTable
             Column::make('sub_total'),
             Column::make('discount'),
             Column::make('total_cost'),
-            Column::make('employee')->title('Order Taken By'),
+            Column::make('taker')->title('Order Taken By'),
 
             Column::computed('action')
                 ->exportable(false)
