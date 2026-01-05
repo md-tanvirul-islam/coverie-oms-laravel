@@ -38,11 +38,17 @@ class ItemController extends Controller
 
         $data['created_by'] = Auth::id();
 
+        $store_ids = $data['store_ids'];
+        unset($data['store_ids']);
+
         try {
             DB::beginTransaction();
 
-            $this->service->create($data);
-
+            foreach ($store_ids as $store_id) {
+                $data['store_id'] = $store_id;
+                $this->service->create($data);
+            }
+            
             DB::commit();
 
             return redirect()
@@ -79,7 +85,6 @@ class ItemController extends Controller
             return redirect()
                 ->route('items.index')
                 ->with('success', 'Item updated.');
-
         } catch (Exception $e) {
             dd($e);
             DB::rollBack();
