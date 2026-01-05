@@ -10,7 +10,7 @@
             {{-- Store --}}
             <div class="mb-3">
                 <label class="form-label">Store</label>
-                <x-dropdowns.select-store name="store_id" :selected="old('store_id')" required />
+                <x-dropdowns.select-store class="select2" name="store_id" :selected="old('store_id')" required />
             </div>
 
             {{-- Invoice ID --}}

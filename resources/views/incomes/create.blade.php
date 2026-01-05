@@ -10,19 +10,19 @@
             {{-- Income Type --}}
             <div class="mb-3">
                 <label class="form-label">Income Type</label>
-                <x-dropdowns.select-income-type name="income_type_id" :selected="old('income_type_id')" required />
+                <x-dropdowns.select-income-type class="select2" name="income_type_id" :selected="old('income_type_id')" required />
             </div>
 
             {{-- Store --}}
             <div class="mb-3">
                 <label class="form-label">Store</label>
-                <x-dropdowns.select-store name="store_id" :selected="old('store_id')" required />
+                <x-dropdowns.select-store class="select2" name="store_id" :selected="old('store_id')" required />
             </div>
 
             {{-- Employee --}}
             <div class="mb-3">
                 <label class="form-label">Employee</label>
-                <x-dropdowns.select-employee name="employee_id" :selected="old('employee_id')" />
+                <x-dropdowns.select-employee class="select2" name="employee_id" :selected="old('employee_id')" />
             </div>
 
             {{-- Amount --}}

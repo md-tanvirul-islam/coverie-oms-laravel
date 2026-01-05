@@ -22,17 +22,17 @@
             {{-- ================= BASIC INFO ================= --}}
             <div class="mb-3">
                 <label class="form-label">Expense Type</label>
-                <x-dropdowns.select-expense-type name="expense_type_id" :selected="old('expense_type_id', $expense->expense_type_id)" />
+                <x-dropdowns.select-expense-type class="select2" name="expense_type_id" :selected="old('expense_type_id', $expense->expense_type_id)" />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Store</label>
-                <x-dropdowns.select-store name="store_id" :selected="old('store_id', $expense->store_id)" />
+                <x-dropdowns.select-store class="select2" name="store_id" :selected="old('store_id', $expense->store_id)" />
             </div>
 
             <div class="mb-3">
                 <label class="form-label">Employee</label>
-                <x-dropdowns.select-employee name="employee_id" :selected="old('employee_id', $expense->employee_id)" />
+                <x-dropdowns.select-employee class="select2" name="employee_id" :selected="old('employee_id', $expense->employee_id)" />
             </div>
 
             <div class="mb-3">

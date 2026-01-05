@@ -19,7 +19,7 @@
                     <tr>
                         {{-- Item --}}
                         <td style="min-width: 220px">
-                            <x-dropdowns.select-item wire:model="items.{{ $index }}.item_id" :name="'items.' . $index . '.item_id'"/>
+                            <x-dropdowns.select-item class="select2" wire:model="items.{{ $index }}.item_id" :name="'items.' . $index . '.item_id'"/>
                         </td>
 
                         {{-- Attributes --}}
@@ -33,7 +33,7 @@
                                     @if ($attr['type'] === 'select')
                                         <select class="form-select form-select-sm"
                                             wire:model="items.{{ $index }}.attributes.{{ $attr['key'] }}">
-                                            <option value="">-- Select --</option>
+                                            <option value="">Select One</option>
                                             @foreach ($attr['options'] as $opt)
                                                 <option value="{{ $opt }}">{{ $opt }}</option>
                                             @endforeach

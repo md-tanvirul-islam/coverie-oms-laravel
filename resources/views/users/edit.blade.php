@@ -41,7 +41,7 @@
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
-                <x-dropdowns.select-role name="role_ids[]" :selected="$roles" multiple />
+                <x-dropdowns.select-role class="select2" name="role_ids[]" :selected="$roles" multiple />
                 @error('roles')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -51,7 +51,7 @@
             {{-- Stores --}}
             <div class="mb-3">
                 <label class="form-label">Stores </label>
-                <x-dropdowns.select-store name="store_ids[]" :selected="$stores" multiple />
+                <x-dropdowns.select-store class="select2" name="store_ids[]" :selected="$stores" multiple />
                 @error('store_ids')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
