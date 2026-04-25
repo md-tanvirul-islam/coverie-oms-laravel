@@ -54,7 +54,7 @@ class CourierPaidInvoiceImport implements
         // ----------------------------
         $orderId = null;
         if (!empty($row['merchant_order_id'])) {
-            $order = Order::where('invoice_id', trim($row['merchant_order_id']))->first();
+            $order = Order::where('invoice_code', trim($row['merchant_order_id']))->first();
             $orderId = $order?->id;
         }
 

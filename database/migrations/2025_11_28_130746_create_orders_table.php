@@ -11,11 +11,11 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('store_id');
-            $table->unsignedBigInteger('employee_id');
             $table->unsignedBigInteger('team_id');
+            $table->unsignedBigInteger('store_id');
+            $table->unsignedBigInteger('taker_employee_id')->nullable();
 
-            $table->string('invoice_id')->unique();
+            $table->string('invoice_code');
             $table->date('order_date');
 
             // Customer info
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('customer_address')->nullable();
 
             // Calculated fields
+            $table->unsignedBigInteger('total_quantity')->default(1);
             $table->decimal('sub_total', 10, 2);
             $table->decimal('discount', 10, 2)->default(0);
             $table->decimal('total_cost', 10, 2);
@@ -36,6 +37,7 @@ return new class extends Migration
             $table->timestamps();
 
             // Indexes (important)
+            $table->unique(['store_id', 'invoice_code']);
             $table->index(['store_id', 'order_date']);
             $table->index('team_id');
         });

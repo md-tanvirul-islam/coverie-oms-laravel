@@ -42,7 +42,7 @@ class OrdersExport implements
     {
         return [
             optional($order->store)->name,
-            $order->invoice_id,
+            $order->invoice_code,
             $order->order_date,
             $order->customer_name,
             $order->customer_phone,

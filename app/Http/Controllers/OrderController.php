@@ -13,6 +13,7 @@ use App\Models\Order;
 use App\Services\EmployeeService;
 use App\Services\ItemService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\LaravelData\Attributes\Validation\In;
@@ -35,20 +36,44 @@ class OrderController extends Controller
 
     public function store(StoreOrderRequest $request)
     {
-        $this->service->create($request->validated());
-        return redirect()->route('orders.index')->with('success', 'Order created.');
+        $data = $request->validated();
+        $data['team_id'] = getPermissionsTeamId();
+
+        try {
+            DB::beginTransaction();
+            $this->service->create($data);
+            DB::commit();
+            return redirect()->route('orders.index')->with('success', 'Order created.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            log_exception($e, 'Order creation failed');
+            return back()->with('error', 'Order creation failed. Please try again.');
+        }
     }
 
-    public function edit(Order $order, EmployeeService $employeeService)
+    public function edit(Order $order, EmployeeService $employeeService, ItemService $itemService)
     {
         $employees = $employeeService->dropdown();
-        return view('orders.edit', compact('order', 'employees'));
+        $items = $itemService->dropdown();
+        return view('orders.edit', compact('order', 'employees', 'items'));
     }
 
     public function update(UpdateOrderRequest $request, Order $order)
     {
-        $this->service->update($order, $request->validated());
-        return redirect()->route('orders.index')->with('success', 'Order updated.');
+        $data = $request->validated();
+        $data['team_id'] = getPermissionsTeamId();
+
+        try {
+            DB::beginTransaction();
+            $this->service->update($order, $data);
+            DB::commit();
+
+            return redirect()->route('orders.index')->with('success', 'Order updated.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            log_exception($e, 'Order update failed');
+            return back()->with('error', 'Order update failed. Please try again.');
+        }
     }
 
     public function destroy(Order $order)
@@ -78,7 +103,7 @@ class OrderController extends Controller
                 foreach ($import->failures() as $failure) {
                     $errors[] = [
                         "row"    => $failure->row(),
-                        "errors" => implode(',', $failure->errors()), 
+                        "errors" => implode(',', $failure->errors()),
                     ];
                 }
 

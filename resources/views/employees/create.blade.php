@@ -81,14 +81,14 @@
 
                 <div class="mb-3">
                     <label class="form-label">Roles</label>
-                    <x-dropdowns.select-role name="role_ids[]" multiple />
+                    <x-dropdowns.select-role class="select2" name="role_ids[]" multiple />
                 </div>
 
                 {{-- ================= STORES ================= --}}
 
                 <div class="mb-3">
                     <label class="form-label">Assigned Stores</label>
-                    <x-dropdowns.select-store id="store-select" name="store_ids[]" :selected="old('store_ids', [])" multiple />
+                    <x-dropdowns.select-store class="select2" id="store-select" name="store_ids[]" :selected="old('store_ids', [])" multiple />
                 </div>
 
                 {{-- ================= PER STORE VISIBILITY ================= --}}

@@ -19,7 +19,7 @@
             {{-- Type --}}
             <div class="mb-3">
                 <label class="form-label">Type</label>
-                <x-dropdowns.select-store-type name="type" :selected="old('type')" />
+                <x-dropdowns.select-store-type class="select2" name="type" :selected="old('type')" />
             </div>
 
             {{-- Status --}}
@@ -31,7 +31,7 @@
             {{-- Authorized Users --}}
             <div class="mb-3">
                 <label class="form-label">Authorized Users</label>
-                <x-dropdowns.select-user id="user-select" name="user_ids[]" :selected="old('user_ids', [])" multiple />
+                <x-dropdowns.select-user id="user-select" class="select2" name="user_ids[]" :selected="old('user_ids', [])" multiple />
             </div>
 
             {{-- Per User Data Visibility --}}

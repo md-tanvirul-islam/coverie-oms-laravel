@@ -11,7 +11,7 @@ class CourierPaidInvoiceService
     {
         $orderId = null;
         if (!empty($data['merchant_order_id'])) {
-            $order = Order::where('invoice_id', trim($data['merchant_order_id']))->first();
+            $order = Order::where('invoice_code', trim($data['merchant_order_id']))->first();
             $orderId = $order?->id;
         }
         $data['order_id'] = $orderId;
@@ -22,7 +22,7 @@ class CourierPaidInvoiceService
     {
         $orderId = null;
         if (!empty($data['merchant_order_id'])) {
-            $order = Order::where('invoice_id', trim($data['merchant_order_id']))->first();
+            $order = Order::where('invoice_code', trim($data['merchant_order_id']))->first();
             $orderId = $order?->id;
         }
 

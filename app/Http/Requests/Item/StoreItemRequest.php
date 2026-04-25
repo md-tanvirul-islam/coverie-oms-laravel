@@ -14,7 +14,8 @@ class StoreItemRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'store_id' => 'required|integer|exists:stores,id',
+            'store_ids' => 'required|array',
+            'store_ids.*' => 'exists:stores,id',
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:100|unique:items,code',
             'description' => 'nullable|string|max:1000',

@@ -13,11 +13,12 @@ return new class extends Migration
 
             $table->unsignedBigInteger('team_id');
             $table->unsignedBigInteger('store_id');
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('item_id')->constrained();
+            $table->unsignedBigInteger('order_id');
+            $table->unsignedBigInteger('item_id');
             $table->decimal('unit_price', 10, 2)->default(0);
             $table->integer('quantity')->default(1);
             $table->json('attributes')->nullable();
+            $table->softDeletes();
             $table->timestamps();
 
             // Relations

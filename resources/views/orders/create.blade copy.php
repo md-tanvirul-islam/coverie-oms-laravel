@@ -19,9 +19,9 @@
             {{-- Invoice ID --}}
             <div class="mb-3">
                 <label class="form-label">Invoice ID</label>
-                <input name="invoice_id" value="{{ old('invoice_id') }}"
-                    class="form-control @error('invoice_id') is-invalid @enderror" required>
-                @error('invoice_id')
+                <input name="invoice_code" value="{{ old('invoice_code') }}"
+                    class="form-control @error('invoice_code') is-invalid @enderror" required>
+                @error('invoice_code')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
             </div>

@@ -40,7 +40,7 @@
             {{-- Roles --}}
             <div class="mb-3">
                 <label class="form-label">Roles </label>
-                <x-dropdowns.select-role name="role_ids[]" multiple :selected="old('role_ids', [])" />
+                <x-dropdowns.select-role class="select2" name="role_ids[]" multiple :selected="old('role_ids', [])" />
                 @error('roles')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -49,7 +49,7 @@
             {{-- Stores --}}
             <div class="mb-3">
                 <label class="form-label">Stores </label>
-                <x-dropdowns.select-store name="store_ids[]" multiple :selected="old('store_ids', [])" />
+                <x-dropdowns.select-store class="select2" name="store_ids[]" multiple :selected="old('store_ids', [])" />
                 @error('store_ids')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
